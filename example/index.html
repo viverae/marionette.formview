@@ -1,0 +1,95 @@
+<html>
+<head>
+    <title>FormView Example</title>
+
+    <link rel="stylesheet" type="text/css" href="style.css">
+
+    <script type="text/javascript" src="../components/jquery/jquery.js"></script>
+    <script type="text/javascript" src="../components/underscore/underscore.js"></script>
+    <script type="text/javascript" src="../components/backbone/backbone.js"></script>
+    <script type="text/javascript" src="../components/backbone.marionette/lib/backbone.marionette.js"></script>
+    <script type="text/javascript" src="../src/FormView.js"></script>
+
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            var app = new Backbone.Marionette.Application(),
+
+                    userModel = Backbone.Model.extend({
+                        defaults : {
+                            fname : 'Default First Name'
+                        },
+                        fields   : {
+                            fname : {
+                                el          : ".fname",
+                                validations : {
+                                    fname    : "Fname Must Be Blah...",
+                                    "min:10" : "Minimum Of 10 Characters",
+                                    "max:20" : "Maximum Of 20 Characters"
+                                },
+                                validateOn  : 'blur'
+                            },
+                            lname : {
+                                el          : ".lname",
+                                validations : {
+                                    lname    : "Fname Must Be Blah...",
+                                    "min:10" : "Minimum Of 10 Characters",
+                                    "max:20" : "Maximum Of 20 Characters"
+                                }
+                            },
+                            about : {
+                                el          : ".about"
+                            }
+                        },
+                        validators    : {
+                            fname : function (cb) {
+
+                            }
+                        }
+                    }),
+
+                    UserForm = new Backbone.Marionette.FormView({
+
+                        template : "#form-template",
+
+                        model : new userModel,
+
+                        onSubmit : function () {
+                            $('.msg').removeClass('error')
+                                    .addClass('success')
+                                    .text("Success")
+                                    .fadeIn();
+                        },
+
+                        onSubmitError : function (field, el, errors) {
+                            $('.msg').removeClass('success')
+                                    .addClass('error')
+                                    .fadeIn();
+
+                            console.log(field);
+                            console.log(el);
+                            console.log(errors);
+                        }
+                    });
+
+            app.addRegions({ body : "body"});
+            app.body.show(UserForm);
+        });
+    </script>
+
+</head>
+
+<body>
+<script id="form-template" type="text/template">
+    <form id='form'>
+        <h2>Marionette.FormView Example</h2>
+        <div class='msg'></div>
+        <input type='text' class='fname' placeholder='First Name'/>
+        <input type='text' class='lname' placeholder='Last Name'/>
+        <textarea class='about' placeholder='A Little Bit About Yourself...'></textarea>
+        <input type='submit' value='Submit'/>
+    </form>
+</script>
+</body>
+</html>
