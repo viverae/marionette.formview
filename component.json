@@ -3,9 +3,6 @@
   "version"      : "0.0.1",
   "main"         : "./src/FormView.js",
   "dependencies" : {
-    "jquery"     : "~1.8.2",
-    "underscore" : "~1.4.1",
-    "marionette" : "~0.9.10",
-    "requirejs"  : "~2.0.6"
+    "marionette" : "*"
   }
 }
