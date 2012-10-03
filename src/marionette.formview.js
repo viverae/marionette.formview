@@ -45,8 +45,8 @@
     coreValidators : {},
     validators     : {}, //Custom Field Validators
 
-    initialize : function (options) {
-      this.options = _.defaults(options, this.defaults.form);
+    initialize : function () {
+      this.options = _.defaults(this.options, this.defaults.form);
       this.model = this.options.model || null;
       if (this.options.template) this.template = this.options.template;
       if (this.options.onSubmit) this.onSubmit = this.options.onSubmit;
