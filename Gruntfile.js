@@ -9,7 +9,7 @@ module.exports = function (grunt) {
     },
     concat: {
       dist: {
-        src  : ['<banner:meta.banner>', 'src/FormView.js'],
+        src  : ['<banner:meta.banner>', 'src/marionette.formview.js'],
         dest : 'build/FormView.js'
       }
     },
@@ -77,7 +77,7 @@ module.exports = function (grunt) {
         'components/underscore/underscore.js',
         'components/backbone/backbone.js',
         'components/backbone.marionette/lib/backbone.marionette.js',
-        'src/FormView.js'
+        'src/marionette.formview.js'
       ],
       specs   : 'spec/**/*.js',
       timeout : 10000
