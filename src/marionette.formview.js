@@ -48,8 +48,6 @@
     initialize : function () {
       this.options = _.defaults(this.options, this.defaults.form);
       this.model = this.options.model || null;
-      if (this.options.template) this.template = this.options.template;
-      if (!this.template) throw new Error("Template Must Be Defined");
       if (this.options.onSubmit) this.onSubmit = this.options.onSubmit;
 
       //Allow Passing In Fields by this.model.fields extending with a fields hash or passing fields to constructor
@@ -60,6 +58,8 @@
         this.data = this.options.data || {};
         this.createBaseModel();
       }
+
+      if (!this.template) this.runInitializers();
     },
 
     createBaseModel : function () {
@@ -183,9 +183,13 @@
       else console.log("onSubmit Must Be Defined");
     },
 
-    onRender : function () {
+    runInitializers : function() {
       this.attachFields();
       this.attachValidators();
+    },
+
+    onRender : function () {
+      this.runInitializers();
     }
   });
 
