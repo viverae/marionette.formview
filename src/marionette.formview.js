@@ -49,6 +49,7 @@
       this.options = _.defaults(this.options, this.defaults.form);
       this.model = this.options.model || null;
       if (this.options.template) this.template = this.options.template;
+      if (!this.template) throw new Error("Template Must Be Defined");
       if (this.options.onSubmit) this.onSubmit = this.options.onSubmit;
 
       //Allow Passing In Fields by this.model.fields extending with a fields hash or passing fields to constructor
@@ -119,12 +120,14 @@
     },
 
     inputBlur  : function (e) {
+      console.log("BLUR");
       var el = e.target || e.srcElement,
         modelField = $(el).attr('data-model'),
+        currentField = this.fields[modelField],
         fieldVal = this.$(el).val();
 
       //If Not In the model we don't care about it
-      if (this.fields[modelField]) {
+      if (currentField && currentField.validateOn === 'blur') {
         this.handleBlurValidation(modelField, el, fieldVal);
       }
     },
@@ -133,11 +136,9 @@
     inputKeyUp : function () { /*noop*/ },
 
     handleBlurValidation : function (field, domEl, val) {
-      if (this.fields[field].validateOn === 'blur') {
-        console.log("HAS BLUR VALIDATIONS");
-        console.log(domEl);
-        console.log(val);
-      }
+      console.log("HAS BLUR VALIDATIONS");
+      console.log(domEl);
+      console.log(val);
     },
 
     validate : function (cb) {
@@ -164,17 +165,17 @@
       //All Valid Until Implemented
       return true;
       /*
-      //LOOK UP THE VALIDATOR FROM this.fields
-      if (!validator) { }
+       //LOOK UP THE VALIDATOR FROM this.fields
+       if (!validator) { }
 
-      //Custom Validator
-      if (this.validators[validator]) {
-        console.log('custom validator');
+       //Custom Validator
+       if (this.validators[validator]) {
+       console.log('custom validator');
 
-      } else {
-        console.log('core validator');
-      }
-      */
+       } else {
+       console.log('core validator');
+       }
+       */
     },
 
     submit : function (data) {
