@@ -51,7 +51,8 @@
       if (this.options.template) this.template = this.options.template;
       if (this.options.onSubmit) this.onSubmit = this.options.onSubmit;
 
-      var hasFields = (this.model && !_.isEmpty(this.model.fields)) || !_.isEmpty(this.options.fields);
+      //Allow Passing In Fields by this.model.fields extending with a fields hash or passing fields to constructor
+      var hasFields = (this.model && !_.isEmpty(this.model.fields)) || !_.isEmpty(this.options.fields || this.fields);
       if (!hasFields) throw new Error("Fields Must Be Provided");
 
       if (!this.model) {
@@ -63,7 +64,7 @@
     createBaseModel : function () {
       var BaseModel = Backbone.Model.extend({});
       this.model = new BaseModel();
-      this.model.fields = this.options.fields;
+      this.model.fields = this.options.fields || this.fields;
       this.model.validators = this.options.validators || {};
       if (this.data) this.model.set(this.data);
     },
