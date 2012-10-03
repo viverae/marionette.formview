@@ -1,8 +1,9 @@
 {
-  "name"         : "FormView",
+  "name"         : "marionette.formview",
   "version"      : "0.0.1",
-  "main"         : "./src/FormView.js",
+  "main"         : "./src/marionette.formview.js",
   "dependencies" : {
     "marionette" : "*"
   }
 }
+
