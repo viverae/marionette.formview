@@ -33,8 +33,8 @@
       }
     },
 
-    customValidators : {}, //Custom Field Validators
-    fields           : {}, //Fields Merged with Defaults
+    rules   : {}, //Custom Field Validation Rules
+    fields  : {}, //Fields Merged with Defaults
 
     constructor : function(){
       Marionette.ItemView.prototype.constructor.apply(this, arguments);
@@ -46,9 +46,9 @@
       var hasFields = (this.model && !_.isEmpty(this.model.fields)) || !_.isEmpty(this.options.fields || this.fields);
       if (!hasFields) throw new Error("Fields Must Be Provided");
 
-      //Attach Fields/Validators to model
+      //Attach Fields/Validation Rules to model
       if (this.model) this.bootstrapModel();
-      //Create Model / Attach Fields/Validators
+      //Create Model / Attach Fields/Validation Rules
       else this.createBaseModel();
       //Attach Events To Template
       if (!this.template) this.runInitializers();
@@ -63,7 +63,7 @@
 
     bootstrapModel : function() {
       this.model.fields = this.getFields();
-      this.model.validators = this.getCustomValidators();
+      this.model.rules = this.getCustomRules();
       if (this.data) this.model.set(this.data);
     },
 
@@ -71,8 +71,8 @@
       return this.options.fields || this.model.fields || this.fields;
     },
 
-    getCustomValidators : function() {
-      return this.options.validators || this.model.validators || this.validators;
+    getCustomRules : function() {
+      return this.options.rules || this.model.rules || this.rules;
     },
 
     createBaseModel : function () {
@@ -92,9 +92,9 @@
       }
     },
 
-    attachValidators : function () {
-      var validators = this.model.validators;
-      if (validators) this.customValidators = validators;
+    attachRules : function () {
+      var rules = this.model.rules;
+      if (rules) this.rules = rules;
     },
 
     serializeFormData : function () {
@@ -176,17 +176,17 @@
       if (_.isFunction(cb)) cb.call(this, errors);
     },
 
-    validateField : function (field,val,validator) {
+    validateField : function (field,val,validationRule) {
       var options;
-      if (validator.indexOf(':') !== -1) {
-        options = validator.split(":");
-        validator = options.shift();
+      if (validationRule.indexOf(':') !== -1) {
+        options = validationRule.split(":");
+        validationRule = options.shift();
       }
 
-      if (this.customValidators[validator]) {
-        return this.customValidators[validator](val);
+      if (this.rules[validationRule]) {
+        return this.rules[validationRule](val);
       } else {
-        return this.validator.validate(validator, val, options);
+        return this.validator.validate(validationRule, val, options);
       }
       return true;
     },
@@ -194,6 +194,9 @@
     submit : function (data) {
       if (typeof this.onSubmit === 'function') this.onSubmit(data);
       else console.log("onSubmit Must Be Defined");
+
+      //Should we be handling the model setting/saving??
+
     },
 
     bindFormEvents : function() {
@@ -204,7 +207,7 @@
 
     runInitializers : function() {
       this.attachFields();
-      this.attachValidators();
+      this.attachRules();
       this.bindFormEvents();
     },
 
@@ -229,8 +232,7 @@
 
       validate : function(validator, val, options) {
         if (_.isFunction(this[validator])) return this[validator](val,options);
-        console.log('Validator does not exist - %s', validator);
-        return false;
+        throw new Error('Validator does not exist - %s', validator);
       },
 
       min : function(val,minLength) {
