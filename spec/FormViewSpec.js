@@ -129,7 +129,7 @@ describe("FormView", function () {
       onSubmit : submit
     }).render();
 
-    form.ui.form.submit();
+    form.$('form').submit();
 
     expect(submit).toHaveBeenCalled();
   });
