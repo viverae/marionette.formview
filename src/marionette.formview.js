@@ -17,84 +17,84 @@
    *
    * @param {Object} [options.fields]          Which Fields to include
    * @param {String} [options.template]        Form template key/name
+   *
+   * @param {Function} [options.onSubmit]
+   * @param {Function} [options.onSubmitError]
+   * @param {Function} [options.onFieldError]
    */
-
   var FormView = Marionette.ItemView.extend({
 
     className : "formView",
 
     defaults : {
-      form  : {},
-      field : {
+      form   : {},
+      field  : {
         validateOn : 'submit'
       }
     },
 
-    ui : {
-      form   : "form",
-      submit : "input[type='submit']"
-    },
+    customValidators : {}, //Custom Field Validators
+    fields           : {}, //Fields Merged with Defaults
 
-    events : {
-      "submit form" : "beforeFormSubmit",
-      "blur input"  : "inputBlur",
-      "keyup input" : "inputKeyUp"
-    },
-
-    fields         : {}, //Fields Merged with Defaults
-    coreValidators : {},
-    validators     : {}, //Custom Field Validators
-
-    initialize : function () {
+    constructor : function(){
+      Marionette.ItemView.prototype.constructor.apply(this, arguments);
       this.options = _.defaults(this.options, this.defaults.form);
-      this.model = this.options.model || null;
-      if (this.options.onSubmit) this.onSubmit = this.options.onSubmit;
-
+      this.data = this.options.data || {};
+      //Localize FormValidator
+      this.validator = FormValidator;
       //Allow Passing In Fields by this.model.fields extending with a fields hash or passing fields to constructor
       var hasFields = (this.model && !_.isEmpty(this.model.fields)) || !_.isEmpty(this.options.fields || this.fields);
       if (!hasFields) throw new Error("Fields Must Be Provided");
 
-      if (!this.model) {
-        this.data = this.options.data || {};
-        this.createBaseModel();
-      }
-
+      //Attach Fields/Validators to model
+      if (this.model) this.bootstrapModel();
+      //Create Model / Attach Fields/Validators
+      else this.createBaseModel();
+      //Attach Events To Template
       if (!this.template) this.runInitializers();
+      this.bindCallbacks();
+    },
+
+    bindCallbacks : function() {
+      if (this.options.onSubmit) this.onSubmit = this.options.onSubmit;
+      if (this.options.onSubmitError) this.onSubmitError = this.options.onSubmitError;
+      if (this.options.onFieldError) this.onFieldError = this.options.onFieldError;
+    },
+
+    bootstrapModel : function() {
+      this.model.fields = this.getFields();
+      this.model.validators = this.getCustomValidators();
+      if (this.data) this.model.set(this.data);
+    },
+
+    getFields : function() {
+      return this.options.fields || this.model.fields || this.fields;
+    },
+
+    getCustomValidators : function() {
+      return this.options.validators || this.model.validators || this.validators;
     },
 
     createBaseModel : function () {
-      var BaseModel = Backbone.Model.extend({});
+      var BaseModel = Backbone.Model.extend();
       this.model = new BaseModel();
-      this.model.fields = this.options.fields || this.fields;
-      this.model.validators = this.options.validators || {};
-      if (this.data) this.model.set(this.data);
+      this.bootstrapModel();
     },
 
     attachFields : function () {
       for (var field in this.model.fields) {
-        var fieldOptions = _.defaults(this.model.fields[field], this.defaults.field),
+        var options = _.defaults(this.model.fields[field], this.defaults.field),
           fieldVal = this.model.get(field);
-        this.setDataModelAttr(fieldOptions.el, field);
-        this.setDomModelField(field, fieldOptions);
-        if (fieldVal) this.populateField(field, fieldVal);
+
+        this.$(options.el).attr('data-model', field);
+        this.fields[field] = options;
+        if (fieldVal) this.$(this.fields[field].el).val(fieldVal);
       }
     },
 
     attachValidators : function () {
       var validators = this.model.validators;
-      if (validators) this.validators = validators;
-    },
-
-    setDataModelAttr : function (el, field) {
-      this.$(el).attr('data-model', field);
-    },
-
-    setDomModelField : function (field, options) {
-      this.fields[field] = options;
-    },
-
-    populateField : function (field, value) {
-      this.$(this.fields[field].el).val(value);
+      if (validators) this.customValidators = validators;
     },
 
     serializeFormData : function () {
@@ -108,19 +108,17 @@
 
     beforeFormSubmit : function (e) {
       e.preventDefault();
-      var formData = this.serializeFormData();
-      if (_.isFunction(this.onSubmit)) this.onSubmit.call(this, formData);
-      this.validate(function (errors) {
-        if (errors) {
-          if (_.isFunction(this.onSubmitError)) this.onSubmitError.call(this, errors);
+      var self = this;
+      this.validate(function(errors) {
+        if (!_.isEmpty(errors)) {
+          if (_.isFunction(self.onSubmitError)) self.onSubmitError.call(self, errors);
           return false;
         }
-        this.submit(formData);
+        self.submit(this.serializeFormData());
       });
     },
 
     inputBlur  : function (e) {
-      console.log("BLUR");
       var el = e.target || e.srcElement,
         modelField = $(el).attr('data-model'),
         currentField = this.fields[modelField],
@@ -136,46 +134,61 @@
     inputKeyUp : function () { /*noop*/ },
 
     handleBlurValidation : function (field, domEl, val) {
-      console.log("HAS BLUR VALIDATIONS");
-      console.log(domEl);
-      console.log(val);
+      var data = {};
+      data[field] = val;
+
+      this.validate(function(errors){
+        if (!_.isEmpty(errors)) {
+          if (_.isFunction(self.onSubmitError)) self.onSubmitError.call(self, errors);
+          return false;
+        }
+      }, data);
     },
 
-    validate : function (cb) {
+    validate : function (cb, data) {
       var self = this,
-        errors = null,
-        serializedModel = this.model.toJSON();
+        errors = {},
+        serializedData = data || this.serializeFormData();
 
-      _.each(serializedModel, function (val, field) {
-        console.log(val);
+      _.each(serializedData, function (val, field) {
         var fieldOptions = self.fields[field],
-          validations = fieldOptions && fieldOptions.validations ? fieldOptions.validations : {};
+          validations = fieldOptions && fieldOptions.validations ? fieldOptions.validations : {},
+          fieldErrors = [];
+
+        val = self.trim(val);
+
         if (validations) {
-          _.each(validations, function (errorMsg, validator) {
-            self.validateField(field, val, validator, errorMsg);
+          _.each(validations, function (errorMsg, validateWith) {
+            var isValid = self.validateField(field, val, validateWith);
+            if (!isValid) fieldErrors.push(errorMsg);
           });
+
+          if (!_.isEmpty(fieldErrors)) {
+            if (_.isFunction(self.onFieldError)) self.onFieldError(field, self.fields[field].el, fieldErrors);
+            errors[field] = {
+              el : self.fields[field].el,
+              val : val,
+              errors : fieldErrors
+            };
+          }
         }
       });
       if (_.isFunction(cb)) cb.call(this, errors);
     },
 
-    //(field, val, validator, errorMsg)
-    validateField : function () {
+    validateField : function (field,val,validator) {
+      var options;
+      if (validator.indexOf(':') !== -1) {
+        options = validator.split(":");
+        validator = options.shift();
+      }
 
-      //All Valid Until Implemented
+      if (this.customValidators[validator]) {
+        return this.customValidators[validator](val);
+      } else {
+        return this.validator.validate(validator, val, options);
+      }
       return true;
-      /*
-       //LOOK UP THE VALIDATOR FROM this.fields
-       if (!validator) { }
-
-       //Custom Validator
-       if (this.validators[validator]) {
-       console.log('custom validator');
-
-       } else {
-       console.log('core validator');
-       }
-       */
     },
 
     submit : function (data) {
@@ -183,15 +196,78 @@
       else console.log("onSubmit Must Be Defined");
     },
 
+    bindFormEvents : function() {
+      this.$('input').blur(this.inputBlur.bind(this));
+      this.$('input').keyup(this.inputKeyUp.bind(this));
+      this.$('form').submit(this.beforeFormSubmit.bind(this));
+    },
+
     runInitializers : function() {
       this.attachFields();
       this.attachValidators();
+      this.bindFormEvents();
     },
 
     onRender : function () {
       this.runInitializers();
+    },
+
+    //Not Sure Where To Put This
+    trim : function(val) {
+      return val.replace(/^\s+|\s+$/g, "");
     }
-  });
+  }),
+
+   FormValidator = {
+
+     regex : {
+       //RFC ????
+       email : /^[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\\.)+([a-zA-Z0-9]){2,3}$/,
+       alpha : /^[a-zA-Z]+$/,
+       alphanum : /^[a-zA-Z0-9]+$/
+     },
+
+      validate : function(validator, val, options) {
+        if (_.isFunction(this[validator])) return this[validator](val,options);
+        console.log('Validator does not exist - %s', validator);
+        return false;
+      },
+
+      min : function(val,minLength) {
+        if (val.length < minLength) return false;
+        return true;
+      },
+
+      max : function(val, maxLength) {
+        if (val.length > maxLength) return false;
+        return true;
+      },
+
+      numeric : function(val) {
+        return _.isNumber(val);
+      },
+
+      alpha : function(val) {
+        return this.regex.alpha.test(val);
+      },
+
+      alphanum : function (val) {
+        return this.regex.alphanum.test(val);
+      },
+
+      email : function(val) {
+        return this.regex.email.test(val);
+      },
+
+      required : function(val) {
+        if (_.isNull(val) || _.isUndefined(val) ||  (_.isString(val) && val.length === 0)) return false;
+        return true;
+      },
+
+      boolean : function(val) {
+        return _.isBoolean(val);
+      }
+  };
 
   return FormView;
 }));
