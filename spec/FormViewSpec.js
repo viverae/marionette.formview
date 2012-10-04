@@ -1,4 +1,4 @@
-/*globals $, require, jasmine, describe, it, expect*/
+/*globals $, require, jasmine, describe, it, expect, loadFixtures, Backbone*/
 
 describe("FormView", function () {
 

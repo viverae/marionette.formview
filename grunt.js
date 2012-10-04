@@ -101,4 +101,6 @@ module.exports = function (grunt) {
   grunt.registerTask('test-web', 'jasmine-server');
   grunt.registerTask('build', 'lint concat min jasmine');
 
+  grunt.registerTask('build-notest', 'lint concat min');
+
 };
