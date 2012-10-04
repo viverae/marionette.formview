@@ -8,7 +8,7 @@
     <script type="text/javascript" src="../components/underscore/underscore.js"></script>
     <script type="text/javascript" src="../components/backbone/backbone.js"></script>
     <script type="text/javascript" src="../components/backbone.marionette/lib/backbone.marionette.js"></script>
-    <script type="text/javascript" src="../src/FormView.js"></script>
+    <script type="text/javascript" src="../src/marionette.formview.js"></script>
 
     <script type="text/javascript">
 
@@ -24,18 +24,19 @@
                             fname : {
                                 el          : ".fname",
                                 validations : {
-                                    fname    : "Fname Must Be Blah...",
+                                    fname    : "fname Must Be Blah...",
                                     "min:10" : "Minimum Of 10 Characters",
-                                    "max:20" : "Maximum Of 20 Characters"
+                                    "max:20" : "Maximum Of 20 Characters",
+                                    "alphanum" : "AlphaNumeric Characters Only"
                                 },
                                 validateOn  : 'blur'
                             },
                             lname : {
                                 el          : ".lname",
                                 validations : {
-                                    lname    : "Fname Must Be Blah...",
-                                    "min:10" : "Minimum Of 10 Characters",
-                                    "max:20" : "Maximum Of 20 Characters"
+                                    "min:2" : "Minimum Of 2 Characters",
+                                    "max:20" : "Maximum Of 20 Characters",
+                                    "alpha"  : "Alpha Characters Only"
                                 }
                             },
                             about : {
@@ -43,8 +44,8 @@
                             }
                         },
                         validators    : {
-                            fname : function (cb) {
-
+                            fname : function (val) {
+                                return true;
                             }
                         }
                     }),
@@ -56,20 +57,26 @@
                         model : new userModel,
 
                         onSubmit : function () {
+                            console.log("ON SUBMIT CALLBACK");
                             $('.msg').removeClass('error')
                                     .addClass('success')
                                     .text("Success")
                                     .fadeIn();
                         },
 
-                        onSubmitError : function (field, el, errors) {
+                        onSubmitError : function (errors) {
+                            console.log("ON SUBMITERROR CALLBACK");
                             $('.msg').removeClass('success')
                                     .addClass('error')
+                                    .text('error')
                                     .fadeIn();
 
-                            console.log(field);
-                            console.log(el);
                             console.log(errors);
+                        },
+
+                        onFieldError : function(fieldName, domEl, errors) {
+                            console.log("FIELD ERROR");
+                            console.log(arguments);
                         }
                     });
 

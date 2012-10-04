@@ -16,6 +16,7 @@
   },
   "devDependencies" : {
     "grunt-jasmine-runner" : "latest",
-    "grunt"         : "~0.3.16"
+    "grunt"                : "~0.3.16",
+    "grunt-open"           : "~0.1.0"
   }
 }

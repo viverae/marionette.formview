@@ -3,6 +3,8 @@ Marionette FormView Component
 
 ###Extension
 
+#Validators Must be truthy/falsy value
+
 ```
 var RegistrationForm = FormView.extend({
       el : "#form",
