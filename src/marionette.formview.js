@@ -215,10 +215,22 @@
       this.runInitializers();
     },
 
-    //Not Sure Where To Put This
+    //Not sure where To Put These
+    //---------------------------
     trim : function(val) {
       return val.replace(/^\s+|\s+$/g, "");
+    },
+
+    getQueryParam : function(param) {
+      param = param.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+      var regParam = "[\\?&]" + param + "=([^&#]*)",
+       regex = new RegExp(regParam),
+       results = regex.exec(window.location.href);
+      if (!results) return false;
+      return decodeURIComponent(results[1].replace(/\+/g, " "));
     }
+    //---------------------------
+
   }),
 
    FormValidator = {

@@ -14,9 +14,7 @@
 
         $(document).ready(function () {
 
-            var app = new Backbone.Marionette.Application(),
-
-                    userModel = Backbone.Model.extend({
+            var userModel = Backbone.Model.extend({
                         defaults : {
                             fname : 'Default First Name'
                         },
@@ -79,7 +77,7 @@
                             console.log(arguments);
                         }
                     });
-
+            var app = new Backbone.Marionette.Application();
             app.addRegions({ body : "body"});
             app.body.show(UserForm);
         });
