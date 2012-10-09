@@ -197,11 +197,19 @@
     runInitializers : function() {
       this.populateFields();
       this.bindFormEvents();
-    }
+    },
+
+    //Forms Using Query String Data
+    getQueryParam : function(param) {
+       param = param.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+       var regParam = "[\\?&]" + param + "=([^&#]*)",
+          regex = new RegExp(regParam),
+          results = regex.exec(window.location.href);
+       if (!results) return false;
+       return decodeURIComponent(results[1].replace(/\+/g, " "));
+     }
 
   });
-
-
 
   var FormValidator = {
 
