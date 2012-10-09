@@ -1,4 +1,4 @@
-/*! marionette-formview - v0.1.0 - 2012-10-08 */
+/*! marionette-formview - v0.1.0 - 2012-10-09 */
 
 /*jshint*/
 /*global Backbone,define*/
@@ -45,7 +45,7 @@
 
       if (!this.model) this.model = new Backbone.Model();
 
-      this.model.bind('change', this.changeFieldVal,this);
+      this.bindTo(this.model, 'change', this.changeFieldVal,this);
       if (this.data) this.model.set(this.data);
 
       //Attach Events to preexisting elements if we don't have a template
@@ -85,22 +85,19 @@
     },
 
     beforeFormSubmit : function (e) {
-      //Form Submission Still Succeeds causing refresh
-      e.preventDefault();
-      e.stopImmediatePropagation();
 
       var errors = this.validate();
       var success = _.isEmpty(errors);
       if (success) {
-      if (_.isFunction(this.onSubmit)) return this.onSubmit.apply(this, [e]);
+        if (_.isFunction(this.onSubmit)) return this.onSubmit.apply(this, [e]);
       } else {
         if (_.isFunction(this.onSubmitFail)) this.onSubmitFail.apply(this, [errors]);
+        e.stopImmediatePropagation();
         return false;
       }
     },
 
     onFieldEvent : function(evt) {
-      console.log(evt);
       this.handleFieldEvent(evt, evt.type);
     },
 
@@ -162,8 +159,9 @@
         tagName = el.prop("tagName").toLowerCase(),
         inputType = el.attr('type').toLowerCase();
 
-      if (tagName == 'input') {
+      if (tagName === 'input') {
         switch (inputType) {
+          case "radio":
           case "checkbox":
             val = el.is(':checked');
             break;
@@ -211,29 +209,18 @@
       this.form = form;
 
       this.$('input')
-        .blur(this.onFieldEvent.bind(this))
-        .keyup(this.onFieldEvent.bind(this))
-        .keydown(this.onFieldEvent.bind(this))
-        .change(this.onFieldEvent.bind(this));
+        .blur(_(this.onFieldEvent).bind(this))
+        .keyup(_(this.onFieldEvent).bind(this))
+        .keydown(_(this.onFieldEvent).bind(this))
+        .change(_(this.onFieldEvent).bind(this));
 
-      form.submit(this.beforeFormSubmit.bind(this));
+      form.submit(_(this.beforeFormSubmit).bind(this));
     },
 
     runInitializers : function() {
       this.populateFields();
       this.bindFormEvents();
-    },
-
-    //Forms Using Query String Data
-    getQueryParam : function(param) {
-      param = param.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
-      var regParam = "[\\?&]" + param + "=([^&#]*)",
-        regex = new RegExp(regParam),
-        results = regex.exec(window.location.href);
-      if (!results) return false;
-      return decodeURIComponent(results[1].replace(/\+/g, " "));
     }
-
   });
 
   var FormValidator = {
