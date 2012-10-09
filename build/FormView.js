@@ -45,11 +45,20 @@
 
       if (!this.model) this.model = new Backbone.Model();
 
+      this.model.bind('change', this.changeFieldVal,this);
       if (this.data) this.model.set(this.data);
 
       //Attach Events to preexisting elements if we don't have a template
       if (!this.template) this.runInitializers();
       this.on('item:rendered',this.runInitializers, this);
+    },
+
+    changeFieldVal : function(model, fields) {
+      var modelProperty = Object.keys(fields.changes),
+        field = this.fields[modelProperty],
+        domItem = this.$(field.el);
+
+      if(domItem) domItem.val(this.model.get(modelProperty));
     },
 
     populateFields : function () {
