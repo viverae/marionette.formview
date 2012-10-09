@@ -22,7 +22,9 @@ module.exports = function (grunt) {
     lint   : {
       src   : 'src/FormView.js',
       grunt : 'Gruntfile.js',
-      tests : 'spec/FormViewSpec.js'
+      tests : [
+        'spec/**/*Spec.js'
+      ]
     },
     jshint : {
       options : {
@@ -62,7 +64,8 @@ module.exports = function (grunt) {
           beforeEach : false,
           expect     : false,
           it         : false,
-          spyOn      : false
+          spyOn      : false,
+          xit        : false
         }
       }
     },
@@ -77,14 +80,21 @@ module.exports = function (grunt) {
     },
     jasmine          : {
       src     : [
-        'components/jquery/jquery.js',
-        'components/underscore/underscore.js',
-        'components/backbone/backbone.js',
-        'components/backbone.marionette/lib/backbone.marionette.js',
+        'vendor/jquery-1.8.2.js',
+        'vendor/underscore.js',
+        'vendor/backbone.js',
+        'vendor/marionette.core.js',
         'src/marionette.formview.js'
       ],
-      specs   : 'spec/**/*.js',
-      timeout : 10000
+      helpers : 'spec/helpers/*.js',
+      specs   : [
+        'spec/**/*Spec.js'
+      ],
+      timeout : 10000,
+      server : {
+        port : 2000,
+      }
+
     },
     'jasmine-server' : {
       browser : true

@@ -1,55 +1,16 @@
-/*globals $, require, jasmine, describe, it, expect, loadFixtures, Backbone*/
+/*globals Marionette, beforeEach, $, require, jasmine, describe, it, expect, loadFixtures, Backbone*/
 
 describe("FormView", function () {
+  "use strict";
+  var stopSubmit, submitSpy;
 
   beforeEach(function () {
     loadFixtures("formTemplate.html");
-  });
-
-  it("Should Have a Base Model With Data as Fields", function () {
-    var options = {
-        template : "#form-template",
-        fields : { fname : { el : ".fname" }},
-        data     : {
-          fname    : 'firstName'
-        }
-      },
-      form = new Backbone.Marionette.FormView(options).render();
-
-    expect(form.model.toJSON()).toEqual(options.data);
-  });
-
-  it("Should Have a Model Property Matching Model Default Field", function () {
-    var modelDefaults = { fname : 'firstName' },
-      Model = Backbone.Model.extend({
-        fields : { fname : { el : ".fname" }},
-        defaults : modelDefaults
-      }),
-      options = {
-        template : "#form-template",
-        model    : new Model()
-      },
-      form = new Backbone.Marionette.FormView(options).render();
-
-    expect(form.model.toJSON()).toEqual(modelDefaults);
-  });
-
-  it("Should have a the fields hash passed into construct", function () {
-    var fieldsHash = {
-        fname : {
-          el : ".fname"
-        }
-      },
-      Model = Backbone.Model.extend({
-        fields : fieldsHash
-      });
-
-    var form = new Backbone.Marionette.FormView({
-      template : "#form-template",
-      model    : new Model()
-    }).render();
-
-    expect(form.model.fields).toEqual(fieldsHash);
+    stopSubmit = function(e) {
+      e.preventDefault();
+      return false;
+    };
+    submitSpy = jasmine.createSpy('Submit Stub').andCallFake(stopSubmit);
   });
 
   it("Should create a base model from data and fields", function () {
@@ -62,38 +23,107 @@ describe("FormView", function () {
         fname : 'test'
       };
 
-    var form = new Backbone.Marionette.FormView({
+    var form = new (Marionette.FormView.extend({
       template : "#form-template",
       data     : dataHash,
       fields   : fieldsHash
-    }).render();
+    }))();
+    form.render();
 
-    expect(form.model).toBeTruthy();
     expect(form.model.get('fname')).toBe(dataHash.fname);
   });
 
-  it("Should set the data-model property of the model field", function () {
+  it("Should populate fields from model", function () {
     var fieldsHash = {
         fname : {
           el : ".fname"
         }
       };
+    var model = new Backbone.Model();
+    model.set('fname','foo');
 
-    var form = new Backbone.Marionette.FormView({
+    var form = new (Marionette.FormView.extend({
       template : "#form-template",
-      fields   : fieldsHash
-    }).render();
+      fields   : fieldsHash,
+      model    : model
+    }))();
+    form.render();
 
-    expect(form.model).toBeTruthy();
-
+    expect(form.$('.fname').val()).toEqual(model.get('fname'));
   });
 
+  it("Should Call onSubmit upon form submit click", function () {
+    var form = new (Marionette.FormView.extend({
+      template : "#form-template",
+      onSubmit : submitSpy
+    }))();
+    form.render();
+    form.$('input[type=submit]').click();
 
-  it("Should have a the instance of onSubmit passed into construct", function () {
-    var Model = Backbone.Model.extend({}),
-      onSubmit = function () {
-        console.log("onSubmit Called");
-      };
+    expect(submitSpy).toHaveBeenCalled();
+  });
+
+  it("Should Call OnSubmit upon formview.submit()", function () {
+    var form = new (Marionette.FormView.extend({
+      template : "#form-template",
+      onSubmit : submitSpy
+    }))();
+    form.render();
+    form.submit();
+
+    expect(submitSpy).toHaveBeenCalled();
+  });
+
+  it("Should call external submit event upon formview.submit()", function () {
+    var form = new (Marionette.FormView.extend({
+      template : "#form-template",
+      fields   : {
+        fname : {
+          el : ".fname"
+        }
+      }
+    }))();
+    form.render();
+    form.form.submit(submitSpy);
+    form.submit();
+
+    expect(submitSpy).toHaveBeenCalled();
+  });
+
+  it("Should Call OnSubmit upon actual form submission", function () {
+    var form = new (Marionette.FormView.extend({
+      template : "#form-template",
+      onSubmit : submitSpy
+    }))();
+    form.render();
+    form.form.submit();
+
+    expect(submitSpy).toHaveBeenCalled();
+  });
+
+  it("Should call onSubmitError when a field does not pass validation", function () {
+    var submitError = jasmine.createSpy('Submit error');
+    var form = new (Marionette.FormView.extend({
+      template : "#form-template",
+      fields : {
+        fname : {
+          el       : '.fname',
+          required : true
+        }
+      },
+      onSubmit : submitSpy,
+      onSubmitError : submitError
+    }))();
+    form.render();
+    form.submit();
+
+    expect(submitError).toHaveBeenCalled();
+    expect(submitSpy).toHaveBeenCalled();
+  });
+
+  xit("Should Call field errors on problem", function () {
+
+    var submit = jasmine.createSpy();
 
     var form = new Backbone.Marionette.FormView({
       template : "#form-template",
@@ -102,30 +132,7 @@ describe("FormView", function () {
           el : ".fname"
         }
       },
-      model    : new Model(),
-      onSubmit : onSubmit
-    }).render();
-
-    expect(form.onSubmit).toEqual(onSubmit);
-  });
-
-  it("Should Call OnSubmit", function () {
-
-    var Model = Backbone.Model.extend({
-        defaults : {
-          email : 'an@example.com'
-        }
-      }),
-      submit = jasmine.createSpy();
-
-    var form = new Backbone.Marionette.FormView({
-      template : "#form-template",
-      fields   : {
-        fname : {
-          el : ".fname"
-        }
-      },
-      model    : new Model(),
+      model    : new Backbone.Model(),
       onSubmit : submit
     }).render();
 
@@ -133,6 +140,5 @@ describe("FormView", function () {
 
     expect(submit).toHaveBeenCalled();
   });
-
 
 });
