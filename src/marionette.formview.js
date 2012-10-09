@@ -88,30 +88,16 @@
 
     inputBlur  : function (e) {
       var el = e.target || e.srcElement,
-        modelField = $(el).data('model-attribute'),
-        currentField = this.fields[modelField],
-        fieldVal = this.$(el).val();
+          field = $(el).data('model-attribute'),
+          fieldOptions = this.fields[field];
 
-      //If Not In the model we don't care about it
-      if (currentField && currentField.validateOn === 'blur') {
-        this.handleBlurValidation(modelField, el, fieldVal);
+      if (fieldOptions && fieldOptions.validateOn === 'blur') {
+        var errors = this.validateField(field);
       }
     },
 
     //If We want Support for keyup validation (passwords, etc)
     inputKeyUp : function () { /*noop*/ },
-
-    handleBlurValidation : function (field, domEl, val) {
-      var data = {};
-      data[field] = val;
-
-      var errors = this.validate(data);
-
-      if (!_.isEmpty(errors)) {
-        if (_.isFunction(this.onSubmitFail)) this.onSubmitFail.call(this, errors);
-        return false;
-      }
-    },
 
     validate : function (data) {
       var self = this,
@@ -141,12 +127,10 @@
         isValid = this.validateRule(val,'required');
         if (!isValid) fieldErrors.push('This field is required');
       } else if (validations) {
-
         _.each(validations, function (errorMsg, validateWith) {
           isValid = this.validateRule(val, validateWith);
           if (!isValid) fieldErrors.push(errorMsg);
         },this);
-
       }
 
       if (!_.isEmpty(fieldErrors)) {
@@ -155,7 +139,7 @@
           el : this.fields[field].el,
           error : fieldErrors
         };
-        if (_.isFunction(this.onFieldError)) this.onFieldError(errorObject);
+        if (_.isFunction(this.onValidationFail)) this.onValidationFail(errorObject);
         return errorObject;
       }
     },
