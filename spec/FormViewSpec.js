@@ -102,7 +102,7 @@ describe("FormView", function () {
   });
 
   it("Should call onSubmitError when a field does not pass validation", function () {
-    var submitError = jasmine.createSpy('Submit error');
+    var submitFail = jasmine.createSpy('Submit error');
     var form = new (Marionette.FormView.extend({
       template : "#form-template",
       fields : {
@@ -112,33 +112,57 @@ describe("FormView", function () {
         }
       },
       onSubmit : submitSpy,
-      onSubmitError : submitError
+      onSubmitFail : submitFail
     }))();
     form.render();
     form.submit();
 
-    expect(submitError).toHaveBeenCalled();
-    expect(submitSpy).toHaveBeenCalled();
+    expect(submitFail).toHaveBeenCalled();
+    expect(submitSpy).not.toHaveBeenCalled();
+  });
+
+  it("Should call onSubmitFail but and onSubmit and not actually submit when a field does not pass validation", function () {
+    var submitFail = jasmine.createSpy('Submit error');
+    var form = new (Marionette.FormView.extend({
+      template : "#form-template",
+      fields : {
+        fname : {
+          el       : '.fname',
+          required : true
+        }
+      },
+      onSubmit : submitSpy,
+      onSubmitFail : submitFail
+    }))();
+    form.render();
+    form.form.on('submit',submitSpy);
+    form.submit();
+
+    expect(submitFail).toHaveBeenCalled();
+    expect(submitSpy).not.toHaveBeenCalled();
   });
 
   xit("Should Call field errors on problem", function () {
 
-    var submit = jasmine.createSpy();
+    var onerror = jasmine.createSpy();
 
-    var form = new Backbone.Marionette.FormView({
+    var form = new (Backbone.Marionette.FormView.extend({
       template : "#form-template",
       fields   : {
         fname : {
-          el : ".fname"
+          el       : ".fname",
+          required : true
         }
       },
-      model    : new Backbone.Model(),
-      onSubmit : submit
-    }).render();
+      onError : onerror,
+      onSubmit : submitSpy
+    }))();
+
+    form.render();
 
     form.$('form').submit();
 
-    expect(submit).toHaveBeenCalled();
+    expect(submitSpy).toHaveBeenCalled();
   });
 
 });
