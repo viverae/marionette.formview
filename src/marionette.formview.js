@@ -86,18 +86,20 @@
       }
     },
 
-    inputBlur  : function (e) {
-      var el = e.target || e.srcElement,
-          field = $(el).data('model-attribute'),
-          fieldOptions = this.fields[field];
+    onFieldEvent : function(evt) {
+      console.log(evt);
+      this.handleFieldEvent(evt, evt.type);
+    },
 
-      if (fieldOptions && fieldOptions.validateOn === 'blur') {
+    handleFieldEvent : function(evt, eventName) {
+      var el = evt.target || evt.srcElement,
+        field = $(el).data('model-attribute'),
+        fieldOptions = this.fields[field];
+
+      if (fieldOptions && fieldOptions.validateOn === eventName) {
         var errors = this.validateField(field);
       }
     },
-
-    //If We want Support for keyup validation (passwords, etc)
-    inputKeyUp : function () { /*noop*/ },
 
     validate : function (data) {
       var self = this,
@@ -174,8 +176,10 @@
       this.form = form;
 
       this.$('input')
-        .blur(this.inputBlur.bind(this))
-        .keyup(this.inputKeyUp.bind(this));
+        .blur(this.onFieldEvent.bind(this))
+        .keyup(this.onFieldEvent.bind(this))
+        .keydown(this.onFieldEvent.bind(this))
+        .change(this.onFieldEvent.bind(this));
 
       form.submit(this.beforeFormSubmit.bind(this));
     },

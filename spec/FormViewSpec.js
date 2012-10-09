@@ -145,28 +145,36 @@ describe("FormView", function () {
     expect(submitSpy).not.toHaveBeenCalled();
   });
 
-  it("Should call field errors on field blur", function () {
-    var form = new (Backbone.Marionette.FormView.extend({
-      template : "#form-template",
-      fields   : {
-        fname : {
-          el       : ".fname",
-          required : true,
-          validateOn : 'blur'
-        }
-      },
-      onValidationFail : validationErrorSpy,
-      onSubmitFail : submitFailSpy,
-      onSubmit : submitSpy
-    }))();
+  // Trying to generalize event testing.
+  function createEventSpec(event) {
+    return function(){
+      var form = new (Backbone.Marionette.FormView.extend({
+        template : "#form-template",
+        fields   : {
+          fname : {
+            el       : ".fname",
+            required : true,
+            validateOn : event
+          }
+        },
+        onValidationFail : validationErrorSpy,
+        onSubmitFail : submitFailSpy,
+        onSubmit : submitSpy
+      }))();
 
-    form.render();
+      form.render();
 
-    form.$('.fname').focus().blur();
+      form.$('.fname').trigger(event);
 
-    expect(validationErrorSpy).toHaveBeenCalled();
-    expect(submitFailSpy).not.toHaveBeenCalled();
-    expect(submitSpy).not.toHaveBeenCalled();
-  });
+      expect(validationErrorSpy).toHaveBeenCalled();
+      expect(submitFailSpy).not.toHaveBeenCalled();
+      expect(submitSpy).not.toHaveBeenCalled();
+    };
+  }
+
+  it("Should call field errors on field blur", createEventSpec('blur'));
+  it("Should call field errors on field keyup", createEventSpec('keyup'));
+  it("Should call field errors on field keydown", createEventSpec('keydown'));
+  it("Should call field errors on field change", createEventSpec('change'));
 
 });
