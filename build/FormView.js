@@ -79,7 +79,7 @@
       var errors = this.validate();
       var success = _.isEmpty(errors);
       if (!success) {
-        if (_.isFunction(this.onSubmitError)) this.onSubmitError.apply(this, [errors]);
+        if (_.isFunction(this.onSubmitFail)) this.onSubmitFail.apply(this, [errors]);
       }
       if (_.isFunction(this.onSubmit)) return this.onSubmit.apply(this, [e]);
     },
@@ -106,7 +106,7 @@
       var errors = this.validate(data);
 
       if (!_.isEmpty(errors)) {
-        if (_.isFunction(this.onSubmitError)) this.onSubmitError.call(this, errors);
+        if (_.isFunction(this.onSubmitFail)) this.onSubmitFail.call(this, errors);
         return false;
       }
     },
