@@ -83,16 +83,14 @@
     },
 
     beforeFormSubmit : function (e) {
-      //Form Submission Still Succeeds causing refresh
-      e.preventDefault();
-      e.stopImmediatePropagation();
 
       var errors = this.validate();
       var success = _.isEmpty(errors);
       if (success) {
-      if (_.isFunction(this.onSubmit)) return this.onSubmit.apply(this, [e]);
+        if (_.isFunction(this.onSubmit)) return this.onSubmit.apply(this, [e]);
       } else {
         if (_.isFunction(this.onSubmitFail)) this.onSubmitFail.apply(this, [errors]);
+        e.stopImmediatePropagation();
         return false;
       }
     },
