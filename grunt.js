@@ -20,7 +20,7 @@ module.exports = function (grunt) {
       }
     },
     lint   : {
-      src   : 'src/FormView.js',
+      src   : 'src/**/*.js',
       grunt : 'Gruntfile.js',
       tests : [
         'spec/**/*Spec.js'
