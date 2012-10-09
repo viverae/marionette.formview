@@ -92,7 +92,7 @@ module.exports = function (grunt) {
       ],
       timeout : 10000,
       server : {
-        port : 2000,
+        port : 2000
       }
 
     },

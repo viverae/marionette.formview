@@ -87,7 +87,7 @@
     beforeFormSubmit : function (evt) {
       evt.preventDefault();
       var errors = this.validate(),
-       success = _.isEmpty(errors);
+        success = _.isEmpty(errors);
 
       if (!success && _.isFunction(this.onSubmitError)) {
         this.onSubmitError.apply(this, [errors]);
@@ -126,9 +126,8 @@
 
     validate : function () {
       var self = this,
-          errors = {};
-
-      var fields = _(this.fields).keys();
+        errors = {},
+        fields = _(this.fields).keys();
 
       _(fields).each(function (field) {
         var fieldErrors = this.validateField(field);
@@ -143,21 +142,17 @@
         fieldErrors = [],
         isValid;
 
-      var el = this.$(fieldOptions.el),val;
-
-      val = el && (el.val ? el.val() : el.text()) || '';
-      val = $.trim(val);
+      var el = this.$(fieldOptions.el),
+        val = this.getInputVal(el);
 
       if (fieldOptions.required) {
         isValid = this.validateRule(val,'required');
         if (!isValid) fieldErrors.push('This field is required');
       } else if (validations) {
-
         _.each(validations, function (errorMsg, validateWith) {
           isValid = this.validateRule(val, validateWith);
           if (!isValid) fieldErrors.push(errorMsg);
         },this);
-
       }
 
       if (!_.isEmpty(fieldErrors)) {
@@ -169,6 +164,31 @@
         if (_.isFunction(this.onFieldError)) this.onFieldError(errorObject);
         return errorObject;
       }
+    },
+
+    getInputVal : function(el) {
+      if (!el) return '';
+      var val,
+        tagName = el.prop("tagName").toLowerCase(),
+        inputType = el.attr('type').toLowerCase();
+
+      if (tagName == 'input') {
+        switch (inputType) {
+          case "checkbox":
+            val = el.is(':checked');
+            break;
+          default :
+            val = $.trim(el.val());
+            break;
+        }
+      } else {
+        if (tagName === 'textarea') val = el.text();
+        if (tagName === 'select') val = $.trim(el.val());
+        //Handle Select / MultiSelect Etc
+        //@todo
+      }
+
+      return val;
     },
 
     validateRule : function (val,validationRule) {
@@ -214,64 +234,64 @@
 
     //Forms Using Query String Data
     getQueryParam : function(param) {
-       param = param.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
-       var regParam = "[\\?&]" + param + "=([^&#]*)",
-          regex = new RegExp(regParam),
-          results = regex.exec(window.location.href);
-       if (!results) return false;
-       return decodeURIComponent(results[1].replace(/\+/g, " "));
-     }
+      param = param.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+      var regParam = "[\\?&]" + param + "=([^&#]*)",
+        regex = new RegExp(regParam),
+        results = regex.exec(window.location.href);
+      if (!results) return false;
+      return decodeURIComponent(results[1].replace(/\+/g, " "));
+    }
 
   });
 
   var FormValidator = {
 
-     regex : {
-       //RFC ????
-       email : /^[a-zA-Z0-9!#$%&'*\+\/=?\^_`{|}~\-]+(?:\\.[a-zA-Z0-9!#$%&'*\+\/=?\^_`{|}~\-]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9\-]*[a-zA-Z0-9])?\\.)+([a-zA-Z0-9]){2,3}$/,
-       alpha : /^[a-zA-Z]+$/,
-       alphanum : /^[a-zA-Z0-9]+$/
-     },
+    regex : {
+      //RFC ????
+      email : /^[a-zA-Z0-9!#$%&'*\+\/=?\^_`{|}~\-]+(?:\\.[a-zA-Z0-9!#$%&'*\+\/=?\^_`{|}~\-]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9\-]*[a-zA-Z0-9])?\\.)+([a-zA-Z0-9]){2,3}$/,
+      alpha : /^[a-zA-Z]+$/,
+      alphanum : /^[a-zA-Z0-9]+$/
+    },
 
-      validate : function(validator, val, options) {
-        if (_.isFunction(this[validator])) return this[validator](val,options);
-        throw new Error('Validator does not exist - %s', validator);
-      },
+    validate : function(validator, val, options) {
+      if (_.isFunction(this[validator])) return this[validator](val,options);
+      throw new Error('Validator does not exist - %s', validator);
+    },
 
-      min : function(val,minLength) {
-        if (val.length < minLength) return false;
-        return true;
-      },
+    min : function(val,minLength) {
+      if (val.length < minLength) return false;
+      return true;
+    },
 
-      max : function(val, maxLength) {
-        if (val.length > maxLength) return false;
-        return true;
-      },
+    max : function(val, maxLength) {
+      if (val.length > maxLength) return false;
+      return true;
+    },
 
-      numeric : function(val) {
-        return _.isNumber(val);
-      },
+    numeric : function(val) {
+      return _.isNumber(val);
+    },
 
-      alpha : function(val) {
-        return this.regex.alpha.test(val);
-      },
+    alpha : function(val) {
+      return this.regex.alpha.test(val);
+    },
 
-      alphanum : function (val) {
-        return this.regex.alphanum.test(val);
-      },
+    alphanum : function (val) {
+      return this.regex.alphanum.test(val);
+    },
 
-      email : function(val) {
-        return this.regex.email.test(val);
-      },
+    email : function(val) {
+      return this.regex.email.test(val);
+    },
 
-      required : function(val) {
-        if (_.isNull(val) || _.isUndefined(val) ||  (_.isString(val) && val.length === 0)) return false;
-        return true;
-      },
+    required : function(val) {
+      if (_.isNull(val) || _.isUndefined(val) ||  (_.isString(val) && val.length === 0)) return false;
+      return true;
+    },
 
-      boolean : function(val) {
-        return _.isBoolean(val);
-      }
+    boolean : function(val) {
+      return _.isBoolean(val);
+    }
   };
 
   return FormView;
