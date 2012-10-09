@@ -45,11 +45,20 @@
 
       if (!this.model) this.model = new Backbone.Model();
 
+      this.model.bind('change', this.changeFieldVal,this);
       if (this.data) this.model.set(this.data);
 
       //Attach Events to preexisting elements if we don't have a template
       if (!this.template) this.runInitializers();
       this.on('item:rendered',this.runInitializers, this);
+    },
+
+    changeFieldVal : function(model, fields) {
+      var modelProperty = Object.keys(fields.changes),
+        field = this.fields[modelProperty],
+        domItem = this.$(field.el);
+
+      if(domItem) domItem.val(this.model.get(modelProperty));
     },
 
     populateFields : function () {
@@ -75,17 +84,21 @@
       return data;
     },
 
-    beforeFormSubmit : function (e) {
-      var errors = this.validate();
-      var success = _.isEmpty(errors);
-      if (!success) {
-        if (_.isFunction(this.onSubmitFail)) this.onSubmitFail.apply(this, [errors]);
+    beforeFormSubmit : function (evt) {
+      evt.preventDefault();
+      var errors = this.validate(),
+       success = _.isEmpty(errors);
+
+      if (!success && _.isFunction(this.onSubmitError)) {
+        this.onSubmitError.apply(this, [errors]);
+        return;
       }
+
       if (_.isFunction(this.onSubmit)) return this.onSubmit.apply(this, [e]);
     },
 
-    inputBlur  : function (e) {
-      var el = e.target || e.srcElement,
+    inputBlur  : function (evt) {
+      var el = evt.target || evt.srcElement,
         modelField = $(el).data('model-attribute'),
         currentField = this.fields[modelField],
         fieldVal = this.$(el).val();
@@ -111,7 +124,7 @@
       }
     },
 
-    validate : function (data) {
+    validate : function () {
       var self = this,
           errors = {};
 
@@ -197,11 +210,19 @@
     runInitializers : function() {
       this.populateFields();
       this.bindFormEvents();
-    }
+    },
+
+    //Forms Using Query String Data
+    getQueryParam : function(param) {
+       param = param.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+       var regParam = "[\\?&]" + param + "=([^&#]*)",
+          regex = new RegExp(regParam),
+          results = regex.exec(window.location.href);
+       if (!results) return false;
+       return decodeURIComponent(results[1].replace(/\+/g, " "));
+     }
 
   });
-
-
 
   var FormValidator = {
 

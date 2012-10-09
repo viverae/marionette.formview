@@ -3,7 +3,7 @@
   "version"      : "0.0.1",
   "main"         : "./src/marionette.formview.js",
   "dependencies" : {
-    "marionette" : "*"
+    "marionette" : "0.10.2"
   }
 }
 
