@@ -22,7 +22,9 @@ module.exports = function (grunt) {
     lint   : {
       src   : 'src/FormView.js',
       grunt : 'Gruntfile.js',
-      tests : 'spec/FormViewSpec.js'
+      tests : [
+        'spec/**/*Spec.js'
+      ]
     },
     jshint : {
       options : {
@@ -83,7 +85,10 @@ module.exports = function (grunt) {
         'vendor/marionette.core.js',
         'src/marionette.formview.js'
       ],
-      specs   : 'spec/**/*.js',
+      helpers : 'spec/helpers/*.js',
+      specs   : [
+        'spec/**/*Spec.js'
+      ],
       timeout : 10000,
       server : {
         port : 2000,
