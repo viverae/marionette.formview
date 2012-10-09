@@ -119,7 +119,7 @@
       var errors = this.validate(data);
 
       if (!_.isEmpty(errors)) {
-        if (_.isFunction(this.onSubmitError)) this.onSubmitError.call(this, errors);
+        if (_.isFunction(this.onSubmitFail)) this.onSubmitFail.call(this, errors);
         return false;
       }
     },

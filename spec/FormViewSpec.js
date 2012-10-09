@@ -2,7 +2,10 @@
 
 describe("FormView", function () {
   "use strict";
-  var stopSubmit, submitSpy;
+  var stopSubmit,
+      submitSpy,
+      submitFailSpy,
+      validationErrorSpy;
 
   beforeEach(function () {
     loadFixtures("formTemplate.html");
@@ -10,7 +13,9 @@ describe("FormView", function () {
       e.preventDefault();
       return false;
     };
-    submitSpy = jasmine.createSpy('Submit Stub').andCallFake(stopSubmit);
+    submitSpy = jasmine.createSpy('Submit').andCallFake(stopSubmit);
+    submitFailSpy = jasmine.createSpy('Submit Fail');
+    validationErrorSpy = jasmine.createSpy('Field Error');
   });
 
   it("Should create a base model from data and fields", function () {
@@ -102,7 +107,6 @@ describe("FormView", function () {
   });
 
   it("Should call onSubmitError when a field does not pass validation", function () {
-    var submitError = jasmine.createSpy('Submit error');
     var form = new (Marionette.FormView.extend({
       template : "#form-template",
       fields : {
@@ -112,33 +116,65 @@ describe("FormView", function () {
         }
       },
       onSubmit : submitSpy,
-      onSubmitError : submitError
+      onSubmitFail : submitFailSpy
     }))();
     form.render();
     form.submit();
 
-    expect(submitError).toHaveBeenCalled();
-    expect(submitSpy).toHaveBeenCalled();
+    expect(submitFailSpy).toHaveBeenCalled();
+    expect(submitSpy).not.toHaveBeenCalled();
   });
 
-  xit("Should Call field errors on problem", function () {
-
-    var submit = jasmine.createSpy();
-
-    var form = new Backbone.Marionette.FormView({
+  it("Should call onSubmitFail but not onSubmit and not actually submit when a field does not pass validation", function () {
+    var form = new (Marionette.FormView.extend({
       template : "#form-template",
-      fields   : {
+      fields : {
         fname : {
-          el : ".fname"
+          el       : '.fname',
+          required : true
         }
       },
-      model    : new Backbone.Model(),
-      onSubmit : submit
-    }).render();
+      onSubmit : submitSpy,
+      onSubmitFail : submitFailSpy
+    }))();
+    form.render();
+    form.form.on('submit',submitSpy);
+    form.submit();
 
-    form.$('form').submit();
-
-    expect(submit).toHaveBeenCalled();
+    expect(submitFailSpy).toHaveBeenCalled();
+    expect(submitSpy).not.toHaveBeenCalled();
   });
+
+  // Trying to generalize event testing.
+  function createEventSpec(event) {
+    return function(){
+      var form = new (Backbone.Marionette.FormView.extend({
+        template : "#form-template",
+        fields   : {
+          fname : {
+            el       : ".fname",
+            required : true,
+            validateOn : event
+          }
+        },
+        onValidationFail : validationErrorSpy,
+        onSubmitFail : submitFailSpy,
+        onSubmit : submitSpy
+      }))();
+
+      form.render();
+
+      form.$('.fname').trigger(event);
+
+      expect(validationErrorSpy).toHaveBeenCalled();
+      expect(submitFailSpy).not.toHaveBeenCalled();
+      expect(submitSpy).not.toHaveBeenCalled();
+    };
+  }
+
+  it("Should call field errors on field blur", createEventSpec('blur'));
+  it("Should call field errors on field keyup", createEventSpec('keyup'));
+  it("Should call field errors on field keydown", createEventSpec('keydown'));
+  it("Should call field errors on field change", createEventSpec('change'));
 
 });
