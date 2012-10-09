@@ -13,9 +13,9 @@ describe("FormView", function () {
       e.preventDefault();
       return false;
     };
-    submitSpy = jasmine.createSpy('Submit').andCallFake(stopSubmit);
-    submitFailSpy = jasmine.createSpy('Submit Fail');
-    validationErrorSpy = jasmine.createSpy('Field Error');
+    submitSpy = jasmine.createSpy('onSubmit').andCallFake(stopSubmit);
+    submitFailSpy = jasmine.createSpy('onSubmitFail');
+    validationErrorSpy = jasmine.createSpy('onValidationFail');
   });
 
   it("Should create a base model from data and fields", function () {
