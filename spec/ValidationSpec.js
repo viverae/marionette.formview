@@ -72,6 +72,43 @@ describe('Validations',function(){
     expect(submitSpy).not.toHaveBeenCalled();
   });
 
+  it('should be able to mix required and custom validations',function(){
+    var form = new (Backbone.Marionette.FormView.extend({
+      template         : "#form-template",
+      fields           : {
+        fname : {
+          el         : ".fname",
+          required   : true,
+          validateOn : 'blur',
+          validations : {
+            foo : 'BAR'
+          }
+        }
+      },
+      rules : {
+        foo : function() {
+          return false;
+        }
+      },
+      onValidationFail : validationErrorSpy,
+      onSubmitFail     : submitFailSpy,
+      onSubmit         : submitSpy
+    }))();
+
+    form.render();
+    form.$('.fname').val('exists');
+    form.submit();
+
+    expect(submitFailSpy).toHaveBeenCalledWith({
+      fname : {
+        el : ".fname",
+        error : ['BAR'],
+        field : 'fname'
+      }
+    });
+    expect(submitSpy).not.toHaveBeenCalled();
+  });
+
   it('should pass custom require string',function(){
     var form = new (Backbone.Marionette.FormView.extend({
       template         : "#form-template",
@@ -173,6 +210,42 @@ describe('Validations',function(){
     it('Should pass on all truthy fields',function(){
       expect(1).toPass('required');
       expect("foo").toPass('required');
+    });
+
+    it('should trump any other validations',function(){
+      var form = new (Backbone.Marionette.FormView.extend({
+        template         : "#form-template",
+        fields           : {
+          fname : {
+            el         : ".fname",
+            required   : "REQUIRED",
+            validateOn : 'blur',
+            validations : {
+              foo : 'BAR'
+            }
+          }
+        },
+        rules : {
+          foo : function() {
+            return false;
+          }
+        },
+        onValidationFail : validationErrorSpy,
+        onSubmitFail     : submitFailSpy,
+        onSubmit         : submitSpy
+      }))();
+
+      form.render();
+      form.submit();
+
+      expect(submitFailSpy).toHaveBeenCalledWith({
+        fname : {
+          el : ".fname",
+          error : ["REQUIRED"],
+          field : 'fname'
+        }
+      });
+      expect(submitSpy).not.toHaveBeenCalled();
     });
   });
 
