@@ -125,7 +125,7 @@
       var fieldOptions = this.fields[field],
         validations = fieldOptions && fieldOptions.validations ? fieldOptions.validations : {},
         fieldErrors = [],
-        isValid;
+        isValid = true;
 
       var el = this.$(fieldOptions.el),
         val = this.getInputVal(el);
@@ -134,7 +134,10 @@
         isValid = this.validateRule(val,'required');
         var errorMessage = typeof fieldOptions.required === 'string' ? fieldOptions.required : 'This field is required';
         if (!isValid) fieldErrors.push(errorMessage);
-      } else if (validations) {
+      }
+
+      // Don't bother with other validations if failed 'required' already
+      if (isValid && validations) {
         _.each(validations, function (errorMsg, validateWith) {
           isValid = this.validateRule(val, validateWith);
           if (!isValid) fieldErrors.push(errorMsg);
@@ -258,15 +261,15 @@
     },
 
     alpha : function(val) {
-      return this.regex.alpha.test(val);
+      return FormValidator.regex.alpha.test(val);
     },
 
     alphanum : function (val) {
-      return this.regex.alphanum.test(val);
+      return FormValidator.regex.alphanum.test(val);
     },
 
     email : function(val) {
-      return this.regex.email.test(val);
+      return FormValidator.regex.email.test(val);
     },
 
     required : function(val) {
