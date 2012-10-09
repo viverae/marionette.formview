@@ -84,43 +84,33 @@
       return data;
     },
 
-    beforeFormSubmit : function (evt) {
-      evt.preventDefault();
-      var errors = this.validate(),
-        success = _.isEmpty(errors);
+    beforeFormSubmit : function (e) {
+      //Form Submission Still Succeeds causing refresh
+      e.preventDefault();
+      e.stopImmediatePropagation();
 
-      if (!success && _.isFunction(this.onSubmitError)) {
-        this.onSubmitError.apply(this, [errors]);
-        return;
-      }
-
+      var errors = this.validate();
+      var success = _.isEmpty(errors);
+      if (success) {
       if (_.isFunction(this.onSubmit)) return this.onSubmit.apply(this, [e]);
-    },
-
-    inputBlur  : function (evt) {
-      var el = evt.target || evt.srcElement,
-        modelField = $(el).data('model-attribute'),
-        currentField = this.fields[modelField],
-        fieldVal = this.$(el).val();
-
-      //If Not In the model we don't care about it
-      if (currentField && currentField.validateOn === 'blur') {
-        this.handleBlurValidation(modelField, el, fieldVal);
+      } else {
+        if (_.isFunction(this.onSubmitFail)) this.onSubmitFail.apply(this, [errors]);
+        return false;
       }
     },
 
-    //If We want Support for keyup validation (passwords, etc)
-    inputKeyUp : function () { /*noop*/ },
+    onFieldEvent : function(evt) {
+      console.log(evt);
+      this.handleFieldEvent(evt, evt.type);
+    },
 
-    handleBlurValidation : function (field, domEl, val) {
-      var data = {};
-      data[field] = val;
+    handleFieldEvent : function(evt, eventName) {
+      var el = evt.target || evt.srcElement,
+        field = $(el).data('model-attribute'),
+        fieldOptions = this.fields[field];
 
-      var errors = this.validate(data);
-
-      if (!_.isEmpty(errors)) {
-        if (_.isFunction(this.onSubmitFail)) this.onSubmitFail.call(this, errors);
-        return false;
+      if (fieldOptions && fieldOptions.validateOn === eventName) {
+        var errors = this.validateField(field);
       }
     },
 
@@ -161,7 +151,7 @@
           el : this.fields[field].el,
           error : fieldErrors
         };
-        if (_.isFunction(this.onFieldError)) this.onFieldError(errorObject);
+        if (_.isFunction(this.onValidationFail)) this.onValidationFail(errorObject);
         return errorObject;
       }
     },
@@ -212,7 +202,7 @@
       return true;
     },
 
-    submit : function (data) {
+    submit : function () {
       this.form.submit();
     },
 
@@ -221,8 +211,10 @@
       this.form = form;
 
       this.$('input')
-        .blur(this.inputBlur.bind(this))
-        .keyup(this.inputKeyUp.bind(this));
+        .blur(this.onFieldEvent.bind(this))
+        .keyup(this.onFieldEvent.bind(this))
+        .keydown(this.onFieldEvent.bind(this))
+        .change(this.onFieldEvent.bind(this));
 
       form.submit(this.beforeFormSubmit.bind(this));
     },
