@@ -141,40 +141,52 @@ describe("FormView", function () {
     form.form.on('submit',submitSpy);
     form.submit();
 
-    expect(submitFailSpy).toHaveBeenCalled();
+    expect(submitFailSpy).toHaveBeenCalledWith({
+      fname : {
+        el : '.fname',
+        error : ['This field is required'],
+        field : 'fname'
+      }
+    });
     expect(submitSpy).not.toHaveBeenCalled();
   });
 
-  // Trying to generalize event testing.
-  function createEventSpec(event) {
-    return function(){
-      var form = new (Backbone.Marionette.FormView.extend({
-        template : "#form-template",
-        fields   : {
-          fname : {
-            el       : ".fname",
-            required : true,
-            validateOn : event
-          }
-        },
-        onValidationFail : validationErrorSpy,
-        onSubmitFail : submitFailSpy,
-        onSubmit : submitSpy
-      }))();
+  describe('Validating on input events',function(){
+    // Trying to generalize event testing.
+    function createEventSpec(event) {
+      return function(){
+        var form = new (Backbone.Marionette.FormView.extend({
+          template : "#form-template",
+          fields   : {
+            fname : {
+              el       : ".fname",
+              required : true,
+              validateOn : event
+            }
+          },
+          onValidationFail : validationErrorSpy,
+          onSubmitFail : submitFailSpy,
+          onSubmit : submitSpy
+        }))();
 
-      form.render();
+        form.render();
 
-      form.$('.fname').trigger(event);
+        form.$('.fname').trigger(event);
 
-      expect(validationErrorSpy).toHaveBeenCalled();
-      expect(submitFailSpy).not.toHaveBeenCalled();
-      expect(submitSpy).not.toHaveBeenCalled();
-    };
-  }
+        expect(validationErrorSpy).toHaveBeenCalledWith({
+          el : '.fname',
+          error : ['This field is required'],
+          field : 'fname'
+        });
+        expect(submitFailSpy).not.toHaveBeenCalled();
+        expect(submitSpy).not.toHaveBeenCalled();
+      };
+    }
 
-  it("Should call field errors on field blur", createEventSpec('blur'));
-  it("Should call field errors on field keyup", createEventSpec('keyup'));
-  it("Should call field errors on field keydown", createEventSpec('keydown'));
-  it("Should call field errors on field change", createEventSpec('change'));
+    it("Should call field errors on field blur", createEventSpec('blur'));
+    it("Should call field errors on field keyup", createEventSpec('keyup'));
+    it("Should call field errors on field keydown", createEventSpec('keydown'));
+    it("Should call field errors on field change", createEventSpec('change'));
+  });
 
 });
