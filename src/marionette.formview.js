@@ -196,7 +196,7 @@
       }
 
       if (this.rules && this.rules[validationRule]) {
-        return this.rules[validationRule](val);
+        return _(this.rules[validationRule]).bind(this)(val);
       } else {
         return _(FormValidator.validate).bind(this)(validationRule, val, options);
       }
