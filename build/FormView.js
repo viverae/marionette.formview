@@ -77,7 +77,7 @@
       function getFieldData(options,field) {
         /*jshint validthis:true*/
         var el = this.$(options.el);
-        if (el) data[field] = el.val() || el.text() || '';
+        if (el) data[field] = this.getInputVal(el);
       }
       _.each(this.fields, _(getFieldData).bind(this));
 
@@ -176,7 +176,9 @@
         }
       } else {
         if (el.is('textarea')) val = el.text();
-        if (el.is('select')) val = $.trim(el.val());
+        if (el.is('select')) {
+          val = $.trim(el.val());
+        }
         //Handle Select / MultiSelect Etc
         //@todo
       }
@@ -198,7 +200,7 @@
       }
 
       if (this.rules && this.rules[validationRule]) {
-        return this.rules[validationRule](val);
+        return _(this.rules[validationRule]).bind(this)(val);
       } else {
         return _(FormValidator.validate).bind(this)(validationRule, val, options);
       }
