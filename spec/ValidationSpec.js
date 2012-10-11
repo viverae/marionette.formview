@@ -200,11 +200,14 @@ describe('Validations',function(){
   });
 
   describe('required',function(){
-    it('Should fail on all falsey fields',function(){
-      expect(0).toFail('required');
+    it('Should fail on undef, empty string, or false',function(){
       expect(undefined).toFail('required');
       expect(false).toFail('required');
       expect('').toFail('required');
+    });
+
+    it('Should pass on 0',function(){
+      expect(0).toPass('required');
     });
 
     it('Should pass on all truthy fields',function(){
