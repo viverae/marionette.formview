@@ -77,7 +77,7 @@
       function getFieldData(options,field) {
         /*jshint validthis:true*/
         var el = this.$(options.el);
-        if (el) data[field] = el.val() || el.text() || '';
+        if (el) data[field] = this.getInputVal(el);
       }
       _.each(this.fields, _(getFieldData).bind(this));
 
@@ -127,15 +127,19 @@
       var fieldOptions = this.fields[field],
         validations = fieldOptions && fieldOptions.validations ? fieldOptions.validations : {},
         fieldErrors = [],
-        isValid;
+        isValid = true;
 
       var el = this.$(fieldOptions.el),
         val = this.getInputVal(el);
 
       if (fieldOptions.required) {
         isValid = this.validateRule(val,'required');
-        if (!isValid) fieldErrors.push('This field is required');
-      } else if (validations) {
+        var errorMessage = typeof fieldOptions.required === 'string' ? fieldOptions.required : 'This field is required';
+        if (!isValid) fieldErrors.push(errorMessage);
+      }
+
+      // Don't bother with other validations if failed 'required' already
+      if (isValid && validations) {
         _.each(validations, function (errorMsg, validateWith) {
           isValid = this.validateRule(val, validateWith);
           if (!isValid) fieldErrors.push(errorMsg);
@@ -155,11 +159,12 @@
 
     getInputVal : function(el) {
       if (!el) return '';
-      var val,
-        tagName = el.prop("tagName").toLowerCase(),
-        inputType = el.attr('type').toLowerCase();
+      if (!el.jQuery) el = this.$(el);
 
-      if (tagName === 'input') {
+      var val;
+
+      if (el.is('input')) {
+        var inputType = el.attr('type').toLowerCase();
         switch (inputType) {
           case "radio":
           case "checkbox":
@@ -170,8 +175,10 @@
             break;
         }
       } else {
-        if (tagName === 'textarea') val = el.text();
-        if (tagName === 'select') val = $.trim(el.val());
+        if (el.is('textarea')) val = el.text();
+        if (el.is('select')) {
+          val = $.trim(el.val());
+        }
         //Handle Select / MultiSelect Etc
         //@todo
       }
@@ -193,9 +200,9 @@
       }
 
       if (this.rules && this.rules[validationRule]) {
-        return this.rules[validationRule](val);
+        return _(this.rules[validationRule]).bind(this)(val);
       } else {
-        return FormValidator.validate(validationRule, val, options);
+        return _(FormValidator.validate).bind(this)(validationRule, val, options);
       }
       return true;
     },
@@ -226,15 +233,21 @@
   var FormValidator = {
 
     regex : {
-      //RFC ????
-      email : /^[a-zA-Z0-9!#$%&'*\+\/=?\^_`{|}~\-]+(?:\\.[a-zA-Z0-9!#$%&'*\+\/=?\^_`{|}~\-]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9\-]*[a-zA-Z0-9])?\\.)+([a-zA-Z0-9]){2,3}$/,
+      //RFC 2822
+      email : /^((([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+(\.([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+)*)|((\x22)((((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(([\x01-\x08\x0b\x0c\x0e-\x1f\x7f]|\x21|[\x23-\x5b]|[\x5d-\x7e]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(\\([\x01-\x09\x0b\x0c\x0d-\x7f]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))))*(((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(\x22)))@((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?$/i,
       alpha : /^[a-zA-Z]+$/,
       alphanum : /^[a-zA-Z0-9]+$/
     },
 
     validate : function(validator, val, options) {
-      if (_.isFunction(this[validator])) return this[validator](val,options);
-      throw new Error('Validator does not exist - %s', validator);
+      if (_.isFunction(FormValidator[validator])) return _(FormValidator[validator]).bind(this)(val,options);
+      throw new Error('Validator does not exist : ' + validator);
+    },
+
+    matches : function(val,field) {
+      /*jshint eqeqeq:false*/
+      var el = this.fields[field[0]].el;
+      return val == this.getInputVal(el);
     },
 
     min : function(val,minLength) {
@@ -252,15 +265,15 @@
     },
 
     alpha : function(val) {
-      return this.regex.alpha.test(val);
+      return FormValidator.regex.alpha.test(val);
     },
 
     alphanum : function (val) {
-      return this.regex.alphanum.test(val);
+      return FormValidator.regex.alphanum.test(val);
     },
 
     email : function(val) {
-      return this.regex.email.test(val);
+      return FormValidator.regex.email.test(val);
     },
 
     required : function(val) {
