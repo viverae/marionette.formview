@@ -106,6 +106,7 @@
 
       if (fieldOptions && fieldOptions.validateOn === eventName) {
         var errors = this.validateField(field);
+        if (!_.isEmpty(errors) && _.isFunction(this.onValidationFail)) this.onValidationFail(errors);
       }
     },
 
@@ -150,7 +151,6 @@
           el : this.fields[field].el,
           error : fieldErrors
         };
-        if (_.isFunction(this.onValidationFail)) this.onValidationFail(errorObject);
         return errorObject;
       }
     },
