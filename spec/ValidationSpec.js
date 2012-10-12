@@ -13,12 +13,12 @@ describe('Validations',function(){
   beforeEach(function () {
     loadFixtures("formTemplate.html");
     stopSubmit = function(e) {
-      console.log(arguments);
+//      console.log(arguments);
       e.preventDefault();
       return false;
     };
     logSpy = function() {
-      console.log(arguments);
+//      console.log(arguments);
     };
     submitSpy = jasmine.createSpy('onSubmit').andCallFake(stopSubmit);
     submitFailSpy = jasmine.createSpy('onSubmitFail').andCallFake(logSpy);
