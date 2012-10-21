@@ -3,6 +3,7 @@
 describe("FormView", function () {
   "use strict";
   var stopSubmit,
+      readySpy,
       submitSpy,
       submitFailSpy,
       validationErrorSpy;
@@ -13,6 +14,8 @@ describe("FormView", function () {
       e.preventDefault();
       return false;
     };
+
+    readySpy = jasmine.createSpy('onReady');
     submitSpy = jasmine.createSpy('onSubmit').andCallFake(stopSubmit);
     submitFailSpy = jasmine.createSpy('onSubmitFail');
     validationErrorSpy = jasmine.createSpy('onValidationFail');
@@ -187,6 +190,16 @@ describe("FormView", function () {
     it("Should call field errors on field keyup", createEventSpec('keyup'));
     it("Should call field errors on field keydown", createEventSpec('keydown'));
     it("Should call field errors on field change", createEventSpec('change'));
+  });
+
+  it("Should Call OnReady when form is attached and ready", function () {
+    var form = new (Marionette.FormView.extend({
+      template : "#form-template",
+      onReady : readySpy
+    }))();
+
+    form.render();
+    expect(readySpy).toHaveBeenCalled();
   });
 
 });
