@@ -105,6 +105,7 @@
 
       if (fieldOptions && fieldOptions.validateOn === eventName) {
         var errors = this.validateField(field);
+        if (!_.isEmpty(errors) && _.isFunction(this.onValidationFail)) this.onValidationFail(errors);
       }
     },
 
@@ -149,7 +150,6 @@
           el : this.fields[field].el,
           error : fieldErrors
         };
-        if (_.isFunction(this.onValidationFail)) this.onValidationFail(errorObject);
         return errorObject;
       }
     },
@@ -189,7 +189,7 @@
       // throw an error because it could be tough to troubleshoot if we just return false
       if (!validationRule) throw new Error('Not passed a validation to test');
 
-      if (validationRule === 'required') return !!val;
+      if (validationRule === 'required') return FormValidator.required(val);
 
       if (validationRule.indexOf(':') !== -1) {
         options = validationRule.split(":");
@@ -275,7 +275,7 @@
     },
 
     required : function(val) {
-      if (_.isNull(val) || _.isUndefined(val) ||  (_.isString(val) && val.length === 0)) return false;
+      if (val === false || _.isNull(val) || _.isUndefined(val) ||  (_.isString(val) && val.length === 0)) return false;
       return true;
     },
 
