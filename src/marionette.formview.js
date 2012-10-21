@@ -83,7 +83,6 @@
     },
 
     beforeFormSubmit : function (e) {
-
       var errors = this.validate();
       var success = _.isEmpty(errors);
       if (success) {
@@ -225,6 +224,7 @@
     runInitializers : function() {
       this.populateFields();
       this.bindFormEvents();
+      if (_.isFunction(this.onReady)) this.onReady();
     }
   });
 
