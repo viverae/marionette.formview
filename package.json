@@ -5,11 +5,10 @@
   "author"          : {
     "name"  : "Chris Miller",
     "email" : "cmiller@onehealth.com",
-    "url"   : "http://onehealth.com/"
+    "url"   : "http://chris-miller.me/"
   },
   "repository"      : {
-    "type" : "git",
-    "url"  : "git://git@git.onehealth.com:2022/marionette-formview.git"
+    "type" : "git"
   },
   "scripts"         : {
     "test" : "grunt jasmine"

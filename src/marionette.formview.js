@@ -18,7 +18,6 @@
    *
    * @param {Object} options                   Options defining this FormView
    * @param {Object} [options.data]            Form Data. (Required if options.model is not set)
-   *
    * @param {Object} [options.fields]          Which Fields to include
    *
    */
