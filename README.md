@@ -1,53 +1,32 @@
-Marionette FormView Component
-============================
+# Marionette.Formview
 
-###Extension
+A Flexible and customizable Backbone.Marionette Form View.
 
-#Validators Must be truthy/falsy value
+- Model Field Definitions
+- Basic/Custom Field Validations
+- Attaches to an existing Form on the DOM
+- Use with Backbone Models
 
-```
-var RegistrationForm = FormView.extend({
-      el : "#form",
+## Getting Started
 
-      fields : {
-         fname : {
-           el          : ".fname",
-           validations : {
-             fname    : "Fname Must Be Blah...",
-             "min:10" : "Minimum Of 10 Characters",
-             "max:20" : "Maximum Of 20 Characters"
-           },
-           validateOn  : 'blur' //submit
-         }
-      },
-      rules : {
-        "fname" : function() {
-          //Validation Logic
-          return true;
-        }
-      },
-      onSubmit      : function (serializedData) {}, //Before The Submission
-      onSubmitError : function (errors) {},
-      onFieldError  : function (fieldName, errorArray) {} //Called Behind the scenes but allow it to be overridden
-});
-```
+- Example to come
 
-/*
+### Dependencies
 
-//Default
-function onFieldError(fieldName, domElement, errorArray) {
-  //Be able to get fieldDef by this.fields['fieldName']
-}
+- Marionette - v1.0.0-beta4
 
-If we have a template already and/or a model passed in we could prepopulate that model, otherwise we create it on the fly
+## Contributing
+In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using grunt.
 
-The FormView should listen for a form Submission. Then we do the magic which will serialize the data and run .validate()
+## Release History
 
-For Rules
+- 0.1.0 Initial release
 
-  If True/False - We Popup Immediately
+## License
 
-  if Async and has a Deferred/Promise attached to it then we
-  Wait to do the validation check until the promise fails/succeeds Then Popup
+Copyright (c) 2012 OneHealth Solutions, Inc
+Licensed under the Apache 2.0 license.
 
-*/
+## Author
+
+Chris Miller
