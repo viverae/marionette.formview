@@ -10,13 +10,13 @@ module.exports = function (grunt) {
     concat: {
       dist: {
         src  : ['<banner:meta.banner>', 'src/marionette.formview.js'],
-        dest : 'build/FormView.js'
+        dest : 'dist/FormView.js'
       }
     },
     min    : {
       dist: {
         src  : ['<banner:meta.banner>', '<config:concat.dist.dest>'],
-        dest : 'build/FormView.min.js'
+        dest : 'dist/FormView.min.js'
       }
     },
     lint   : {
