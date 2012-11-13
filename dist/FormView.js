@@ -1,6 +1,5 @@
-/*! marionette-formview - v0.1.0 - 2012-10-21 */
+/*! marionette-formview - v0.1.0 - 2012-11-13 */
 
-/*jshint*/
 /*global Backbone,define*/
 
 ;(function (root, factory) {
@@ -20,7 +19,6 @@
    *
    * @param {Object} options                   Options defining this FormView
    * @param {Object} [options.data]            Form Data. (Required if options.model is not set)
-   *
    * @param {Object} [options.fields]          Which Fields to include
    *
    */
@@ -107,12 +105,12 @@
 
       if (fieldOptions && fieldOptions.validateOn === eventName) {
         var errors = this.validateField(field);
+        if (!_.isEmpty(errors) && _.isFunction(this.onValidationFail)) this.onValidationFail(errors);
       }
     },
 
     validate : function () {
-      var self = this,
-        errors = {},
+      var errors = {},
         fields = _(this.fields).keys();
 
       _(fields).each(function (field) {
@@ -151,7 +149,6 @@
           el : this.fields[field].el,
           error : fieldErrors
         };
-        if (_.isFunction(this.onValidationFail)) this.onValidationFail(errorObject);
         return errorObject;
       }
     },
@@ -191,7 +188,7 @@
       // throw an error because it could be tough to troubleshoot if we just return false
       if (!validationRule) throw new Error('Not passed a validation to test');
 
-      if (validationRule === 'required') return !!val;
+      if (validationRule === 'required') return FormValidator.required(val);
 
       if (validationRule.indexOf(':') !== -1) {
         options = validationRule.split(":");
@@ -277,7 +274,7 @@
     },
 
     required : function(val) {
-      if (_.isNull(val) || _.isUndefined(val) ||  (_.isString(val) && val.length === 0)) return false;
+      if (val === false || _.isNull(val) || _.isUndefined(val) ||  (_.isString(val) && val.length === 0)) return false;
       return true;
     },
 
