@@ -1,21 +1,25 @@
 {
-  "name"            : "marionette-formview",
-  "description"     : "FormView Plugin For Backbone.Marionette",
-  "version"         : "0.1.0",
-  "author"          : {
-    "name"  : "Chris Miller",
-    "email" : "cmiller@onehealth.com",
-    "url"   : "http://chris-miller.me/"
+  "name": "marionette-formview",
+  "description": "FormView Plugin For Backbone.Marionette",
+  "version": "0.1.0",
+  "author": {
+    "name": "Chris Miller",
+    "email": "cmiller@onehealth.com",
+    "url": "http://chris-miller.me/"
   },
-  "repository"      : {
-    "type" : "git"
+  "repository": {
+    "type": "git"
   },
-  "scripts"         : {
-    "test" : "grunt jasmine"
+  "scripts": {
+    "test": "grunt jasmine"
   },
-  "devDependencies" : {
-    "grunt-jasmine-runner" : "latest",
-    "grunt"                : "~0.4.0a",
-    "grunt-open"           : "~0.1.0"
+  "devDependencies": {
+    "grunt-jasmine-runner": "latest",
+    "grunt": "~0.4.0a",
+    "grunt-open": "~0.1.0",
+    "grunt-contrib-jshint": "latest"
+  },
+  "dependencies": {
+    "grunt-contrib-jshint": "~0.1.0"
   }
 }

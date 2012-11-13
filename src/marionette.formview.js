@@ -1,4 +1,3 @@
-/*jshint*/
 /*global Backbone,define*/
 
 ;(function (root, factory) {
@@ -109,8 +108,7 @@
     },
 
     validate : function () {
-      var self = this,
-        errors = {},
+      var errors = {},
         fields = _(this.fields).keys();
 
       _(fields).each(function (field) {

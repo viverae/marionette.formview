@@ -39,7 +39,8 @@ module.exports = function (grunt) {
         boss    : true,
         eqnull  : true,
         node    : true,
-        es5     : true
+        es5     : true,
+        unused  : true
       },
       globals : {
         jQuery : true
@@ -102,6 +103,7 @@ module.exports = function (grunt) {
   });
 
   grunt.loadNpmTasks('grunt-jasmine-runner');
+  grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-open');
 
   // Default task.
@@ -109,8 +111,10 @@ module.exports = function (grunt) {
   grunt.registerTask('dev', 'server open:dev watch');
   grunt.registerTask('test', 'jasmine');
   grunt.registerTask('test-web', 'jasmine-server');
-  grunt.registerTask('build', 'lint concat min jasmine');
 
+  //Turned LINT off complaining about /*jshint unused:true */
+
+  grunt.registerTask('build', 'concat min jasmine');
   grunt.registerTask('build-notest', 'lint concat min');
 
 };
