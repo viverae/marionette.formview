@@ -1,4 +1,4 @@
-/*! marionette-formview - v0.1.0 - 2012-11-13 */
+/*! marionette-formview - v0.1.0 - 2012-12-03 */
 
 /*global Backbone,define*/
 
@@ -23,7 +23,6 @@
    *
    */
   var FormView = Marionette.ItemView.extend({
-    tagName : 'form',
 
     className : "formView",
 
@@ -32,7 +31,9 @@
         validateOn : 'submit'
       }
     },
+
     rules   : {}, //Custom Field Validation Rules
+
     fields  : {}, //Fields Merged with Defaults
 
     constructor : function(){

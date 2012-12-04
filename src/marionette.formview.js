@@ -21,7 +21,6 @@
    *
    */
   var FormView = Marionette.ItemView.extend({
-    tagName : 'form',
 
     className : "formView",
 
@@ -30,7 +29,9 @@
         validateOn : 'submit'
       }
     },
+
     rules   : {}, //Custom Field Validation Rules
+
     fields  : {}, //Fields Merged with Defaults
 
     constructor : function(){
