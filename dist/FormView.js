@@ -1,3 +1,4 @@
+/*! marionette-formview - v0.1.1 - 2012-12-13 */
 /*global Backbone,define*/
 
 ;(function (root, factory) {
