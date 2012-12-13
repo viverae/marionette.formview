@@ -9,7 +9,7 @@ describe("FormView", function () {
       validationErrorSpy;
 
   beforeEach(function () {
-    loadFixtures("formTemplate.html");
+    loadFixtures("formTemplate.html", "nestedFormTemplate.html");
     stopSubmit = function(e) {
       e.preventDefault();
       return false;
@@ -200,6 +200,38 @@ describe("FormView", function () {
 
     form.render();
     expect(readySpy).toHaveBeenCalled();
+  });
+
+  it("Should populate and serialize nested form data", function(){
+    var model = new Backbone.Model({
+      address: {
+        street: '123 Test Street',
+        city: 'Fakeville',
+        state: 'CA',
+        zip: '11111'
+      },
+      items: [
+        'item one',
+        'item two',
+        'item three'
+      ]
+    });
+    var fields = {
+      address: {
+        el: '.address'
+      },
+      items: {
+        el: '.items'
+      }
+    };
+    var form = new (Marionette.FormView.extend({
+      template: '#nested-form-template',
+      fields: fields,
+      model: model
+    }))();
+    form.render();
+    var serialized = form.serializeFormData();
+    expect(serialized).toEqual(model);
   });
 
 });
