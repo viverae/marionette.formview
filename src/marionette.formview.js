@@ -156,7 +156,23 @@
       if (!el) return '';
       if (!el.jQuery) el = this.$(el);
 
-      var val;
+      var val, self = this;
+
+      if (el.length > 1){
+        el.each(function(){
+          var elem = $(this),
+              nameField = /\[(.*)\]/.exec(elem.attr('name'));
+
+          if (nameField && nameField[1]){
+            val = val || {};
+            val[nameField[1]] = self.getInputVal(elem);
+          } else {
+            val = val || [];
+            val.push(self.getInputVal(elem));
+          }
+        });
+        return val;
+      }
 
       if (el.is('input')) {
         var inputType = el.attr('type').toLowerCase();
