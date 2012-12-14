@@ -57,7 +57,7 @@ describe("FormView", function () {
     }))();
     form.render();
 
-    expect(form.$('.fname').val()).toEqual(model.get('fname'));
+    expect(form.$('[data-field="fname"]').val()).toEqual(model.get('fname'));
   });
 
   it("Should Call onSubmit upon form submit click", function () {
@@ -174,7 +174,7 @@ describe("FormView", function () {
 
         form.render();
 
-        form.$('.fname').trigger(event);
+        form.$('[data-field="fname"]').trigger(event);
 
         expect(validationErrorSpy).toHaveBeenCalledWith({
           el : '.fname',
@@ -231,7 +231,7 @@ describe("FormView", function () {
     }))();
     form.render();
     var serialized = form.serializeFormData();
-    expect(serialized).toEqual(model);
+    expect(serialized).toEqual(model.toJSON());
   });
 
 });
