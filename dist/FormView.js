@@ -1,4 +1,4 @@
-/*! marionette-formview - v0.1.1 - 2012-12-13 */
+/*! marionette-formview - v0.1.1 - 2012-12-17 */
 /*global Backbone,define*/
 
 ;(function (root, factory) {
@@ -54,30 +54,55 @@
     changeFieldVal : function(model, fields) {
       var modelProperty = Object.keys(fields.changes),
         field = this.fields[modelProperty],
-        domItem = this.$(field.el);
+        domItem = this.$('[data-field="'+field+'"]');
 
       if(domItem) domItem.val(this.model.get(modelProperty));
     },
 
     populateFields : function () {
-      _(this.fields).each(function(options,field) {
-        var value = this.model.get(field);
+      _(this.fields).each(function(options, field) {
+        var value = this.model.get(field),
+            elem;
 
-        this.$(options.el).data('model-attribute', field);
-        if (typeof value === 'undefined') value = '';
-        this.$(options.el).val(value);
-      },this);
+        if (typeof value === 'object'){
+          // @todo support multi-level nesting
+          _(value).each(function(val, key){
+            var fieldname = field + '\\[' + key + '\\]';
+            elem = this.$('[data-field="'+fieldname+'"]');
+            elem.val(val);
+          }, this);
+        } else {
+          elem = this.$('[data-field="'+field+'"]');
+          elem.val(value);
+        }
+      }, this);
+    },
+
+    addValueViaKeyArray: function(obj, keyArray, value){
+      var i = 0, current = obj, key = keyArray[i];
+      while (i < keyArray.length - 1){
+        if ($.isNumeric(keyArray[i+1])){
+          current[key] = current[key] || [];
+        } else {
+          current[key] = current[key] || {};
+        }
+        current = current[key];
+        key = keyArray[++i];
+      }
+      current[key] = value;
     },
 
     serializeFormData : function () {
-      var data = {};
+      var data = {}, self = this;
 
-      function getFieldData(options,field) {
-        /*jshint validthis:true*/
-        var el = this.$(options.el);
-        if (el) data[field] = this.getInputVal(el);
-      }
-      _.each(this.fields, _(getFieldData).bind(this));
+      this.$('[data-field]').each(function(){
+        var elem = $(this), val;
+        var keyArray = elem.attr('data-field').match(/(\w+)/g);
+        if (self.fields[keyArray[0]]){
+          val = self.getInputVal(elem);
+          self.addValueViaKeyArray(data, keyArray, val);
+        }
+      });
 
       return data;
     },
@@ -100,7 +125,7 @@
 
     handleFieldEvent : function(evt, eventName) {
       var el = evt.target || evt.srcElement,
-        field = $(el).data('model-attribute'),
+        field = $(el).attr('data-field'),
         fieldOptions = this.fields[field];
 
       if (fieldOptions && fieldOptions.validateOn === eventName) {
@@ -126,8 +151,7 @@
         fieldErrors = [],
         isValid = true;
 
-      var el = this.$(fieldOptions.el),
-        val = this.getInputVal(el);
+      var val = this.getInputVal(field);
 
       if (fieldOptions.required) {
         isValid = this.validateRule(val,'required');
@@ -153,28 +177,11 @@
       }
     },
 
-    getInputVal : function(el) {
-      if (!el) return '';
-      if (!el.jQuery) el = this.$(el);
+    getInputVal : function(input) {
+      //takes field name or jQuery object
+      var el = input.jquery ? input : this.$('[data-field="'+input+'"]');
 
-      var val, self = this;
-
-      if (el.length > 1){
-        el.each(function(){
-          var elem = $(this),
-              nameField = /\[(.*)\]/.exec(elem.attr('name'));
-
-          if (nameField && nameField[1]){
-            val = val || {};
-            val[nameField[1]] = self.getInputVal(elem);
-          } else {
-            val = val || [];
-            val.push(self.getInputVal(elem));
-          }
-        });
-        return val;
-      }
-
+      var val;
       if (el.is('input')) {
         var inputType = el.attr('type').toLowerCase();
         switch (inputType) {
@@ -259,8 +266,7 @@
 
     matches : function(val,field) {
       /*jshint eqeqeq:false*/
-      var el = this.fields[field[0]].el;
-      return val == this.getInputVal(el);
+      return val == this.getInputVal(field);
     },
 
     min : function(val,minLength) {
