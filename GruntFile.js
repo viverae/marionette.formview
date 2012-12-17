@@ -74,11 +74,6 @@ module.exports = function (grunt) {
         }
       }
     },
-    open : {
-      dev : {
-        url : 'http://127.0.0.1:8000/example/'
-      }
-    },
     watch            : {
       files : ['<%= jasmine.specs %>', 'src/*js'],
       tasks : 'jasmine'
@@ -104,18 +99,15 @@ module.exports = function (grunt) {
 
   grunt.loadNpmTasks('grunt-contrib-jasmine');
   grunt.loadNpmTasks('grunt-contrib-jshint');
-  grunt.loadNpmTasks('grunt-open');
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-uglify');
 
   // Default task.
   grunt.registerTask('default', ['lint', 'jasmine']);
-  grunt.registerTask('dev', ['server', 'open:dev', 'watch']);
   grunt.registerTask('test', ['jasmine']);
   grunt.registerTask('test-web', ['jasmine-server']);
 
   //Turned LINT off complaining about /*jshint unused:true */
-
   grunt.registerTask('build', ['concat', 'uglify', 'jasmine']);
   grunt.registerTask('build-notest', ['lint', 'concat', 'uglify']);
 
