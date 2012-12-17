@@ -1,4 +1,4 @@
-/*! marionette-formview - v0.1.1 - 2012-12-17 */
+/*! marionette-formview - v0.2.0 - 2012-12-17 */
 /*global Backbone,define*/
 
 ;(function (root, factory) {
@@ -62,46 +62,27 @@
     populateFields : function () {
       _(this.fields).each(function(options, field) {
         var value = this.model.get(field),
-            elem;
-
-        if (typeof value === 'object'){
-          // @todo support multi-level nesting
-          _(value).each(function(val, key){
-            var fieldname = field + '\\[' + key + '\\]';
-            elem = this.$('[data-field="'+fieldname+'"]');
-            elem.val(val);
-          }, this);
-        } else {
           elem = this.$('[data-field="'+field+'"]');
+
+        if ($.isPlainObject(value)){
+          _(value).each(function(val, key){
+            elem.find('[data-property="'+key+'"]').val(val);
+          });
+        } else if ($.isArray(value)){
+          _(value).each(function(val, index){
+            elem.find('[data-index="'+index+'"]').val(val);
+          });
+        } else {
           elem.val(value);
         }
       }, this);
     },
 
-    addValueViaKeyArray: function(obj, keyArray, value){
-      var i = 0, current = obj, key = keyArray[i];
-      while (i < keyArray.length - 1){
-        if ($.isNumeric(keyArray[i+1])){
-          current[key] = current[key] || [];
-        } else {
-          current[key] = current[key] || {};
-        }
-        current = current[key];
-        key = keyArray[++i];
-      }
-      current[key] = value;
-    },
-
     serializeFormData : function () {
       var data = {}, self = this;
 
-      this.$('[data-field]').each(function(){
-        var elem = $(this), val;
-        var keyArray = elem.attr('data-field').match(/(\w+)/g);
-        if (self.fields[keyArray[0]]){
-          val = self.getInputVal(elem);
-          self.addValueViaKeyArray(data, keyArray, val);
-        }
+      _(this.fields).each(function(options, field){
+        data[field] = self.getInputVal(field);
       });
 
       return data;
@@ -180,9 +161,23 @@
     getInputVal : function(input) {
       //takes field name or jQuery object
       var el = input.jquery ? input : this.$('[data-field="'+input+'"]');
+      var val = null, self = this;
 
-      var val;
-      if (el.is('input')) {
+      if (el.data('fieldtype') === 'object'){
+        val = {};
+        el.find('[data-property]').each(function(){
+          var elem = $(this);
+          var prop = elem.attr('data-property');
+          val[prop] = self.getInputVal(elem);
+        });
+      } else if (el.data('fieldtype') === 'array'){
+        val = [];
+        el.find('[data-index]').each(function(){
+          var elem = $(this);
+          var index = elem.data('index');
+          val[index] = self.getInputVal(elem);
+        });
+      } else if (el.is('input')) {
         var inputType = el.attr('type').toLowerCase();
         switch (inputType) {
           case "radio":
