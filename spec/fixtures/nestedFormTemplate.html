@@ -1,13 +1,17 @@
 <script id='nested-form-template' type='text/template'>
   <form id='nested-form'>
     <h2>Marionette.FormView Nested Form Field Example</h2>
-    <input type='text' data-field='address[street]'>
-    <input type='text' data-field='address[city]'>
-    <input type='text' data-field='address[state]'>
-    <input type='text' data-field='address[zip]'>
-    <input type='text' data-field='items[0]'>
-    <input type='text' data-field='items[1]'>
-    <input type='text' data-field='items[2]'>
+    <div data-field='address' data-fieldtype='object'>
+      <input type='text' data-property='street'>
+      <input type='text' data-property='city'>
+      <input type='text' data-property='state'>
+      <input type='text' data-property='zip'>
+    </div>
+    <div data-field='items' data-fieldtype='array'>
+      <input type='text' data-index='0'>
+      <input type='text' data-index='1'>
+      <input type='text' data-index='2'>
+    </div>
     <input type='submit' value='Submit'>
   </form>
 </script>
