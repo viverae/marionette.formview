@@ -20,7 +20,7 @@
    * @param {Object} [options.fields]          Which Fields to include
    *
    */
-  var FormView = Marionette.ItemView.extend({
+  var FormView = Marionette.FormView = Marionette.ItemView.extend({
 
     className : "formView",
 

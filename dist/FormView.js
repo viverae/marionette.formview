@@ -1,4 +1,4 @@
-/*! marionette-formview - v0.1.0 - 2012-12-03 */
+/*! marionette-formview - v0.1.1 - 2012-12-17 */
 
 /*global Backbone,define*/
 
@@ -22,7 +22,7 @@
    * @param {Object} [options.fields]          Which Fields to include
    *
    */
-  var FormView = Marionette.ItemView.extend({
+  var FormView = Marionette.FormView = Marionette.ItemView.extend({
 
     className : "formView",
 
