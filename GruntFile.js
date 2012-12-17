@@ -2,20 +2,24 @@ module.exports = function (grunt) {
 
   // Project configuration.
   grunt.initConfig({
-    pkg    : '<json:package.json>',
-    meta   : {
-      banner : '/*! <%= pkg.name %> - v<%= pkg.version %> - ' +
-        '<%= grunt.template.today("yyyy-mm-dd") %> */'
-    },
+    pkg    : grunt.file.readJSON('package.json'),
+    banner : '/*! <%= pkg.name %> - v<%= pkg.version %> - ' +
+             '<%= grunt.template.today("yyyy-mm-dd") %> */\n',
     concat: {
+      options: {
+        banner: '<%= banner %>'
+      },
       dist: {
-        src  : ['<banner:meta.banner>', 'src/marionette.formview.js'],
+        src  : ['src/marionette.formview.js'],
         dest : 'dist/FormView.js'
       }
     },
-    min    : {
+    uglify    : {
+      options: {
+        banner: '<%= banner %>'
+      },
       dist: {
-        src  : ['<banner:meta.banner>', '<config:concat.dist.dest>'],
+        src  : '<%= concat.dist.dest %>',
         dest : 'dist/FormView.min.js'
       }
     },
@@ -76,45 +80,43 @@ module.exports = function (grunt) {
       }
     },
     watch            : {
-      files : ['<config:jasmine.specs>', 'src/*js'],
+      files : ['<%= jasmine.specs %>', 'src/*js'],
       tasks : 'jasmine'
     },
     jasmine          : {
-      src     : [
-        'vendor/jquery-1.8.2.js',
-        'vendor/underscore.js',
-        'vendor/backbone.js',
-        'vendor/marionette.core.js',
-        'src/marionette.formview.js'
-      ],
-      helpers : 'spec/helpers/*.js',
-      specs   : [
-        'spec/**/*Spec.js'
-      ],
-      timeout : 10000,
-      server : {
-        port : 2000
+      test: {
+        src     : [
+          'vendor/jquery-1.8.2.js',
+          'vendor/underscore.js',
+          'vendor/backbone.js',
+          'vendor/marionette.core.js',
+          'src/marionette.formview.js'
+        ],
+        options : {
+          helpers : 'spec/helpers/*.js',
+          specs   : [
+            'spec/**/*Spec.js'
+          ]
+        }
       }
-
-    },
-    'jasmine-server' : {
-      browser : true
     }
   });
 
-  grunt.loadNpmTasks('grunt-jasmine-runner');
+  grunt.loadNpmTasks('grunt-contrib-jasmine');
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-open');
+  grunt.loadNpmTasks('grunt-contrib-concat');
+  grunt.loadNpmTasks('grunt-contrib-uglify');
 
   // Default task.
-  grunt.registerTask('default', 'lint jasmine');
-  grunt.registerTask('dev', 'server open:dev watch');
-  grunt.registerTask('test', 'jasmine');
-  grunt.registerTask('test-web', 'jasmine-server');
+  grunt.registerTask('default', ['lint', 'jasmine']);
+  grunt.registerTask('dev', ['server', 'open:dev', 'watch']);
+  grunt.registerTask('test', ['jasmine']);
+  grunt.registerTask('test-web', ['jasmine-server']);
 
   //Turned LINT off complaining about /*jshint unused:true */
 
-  grunt.registerTask('build', 'concat min jasmine');
-  grunt.registerTask('build-notest', 'lint concat min');
+  grunt.registerTask('build', ['concat', 'uglify', 'jasmine']);
+  grunt.registerTask('build-notest', ['lint', 'concat', 'uglify']);
 
 };
