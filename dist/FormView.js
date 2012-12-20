@@ -160,7 +160,7 @@
           var prop = elem.attr('data-property');
           if (mode === 'get'){
             val[prop] = self.inputVal(elem);
-          } else {
+          } else if (val){
             self.inputVal(elem, val[prop]);
           }
         });
@@ -171,7 +171,7 @@
           var index = elem.data('index');
           if (mode === 'get'){
             val[index] = self.inputVal(elem);
-          } else {
+          } else if (val){
             self.inputVal(elem, val[index]);
           }
         });
