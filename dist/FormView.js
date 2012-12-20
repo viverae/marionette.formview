@@ -1,4 +1,4 @@
-/*! marionette-formview - v0.2.0 - 2012-12-17 */
+/*! marionette-formview - v0.2.1 - 2012-12-20 */
 /*global Backbone,define*/
 
 ;(function (root, factory) {
@@ -64,17 +64,7 @@
         var value = this.model.get(field),
           elem = this.$('[data-field="'+field+'"]');
 
-        if ($.isPlainObject(value)){
-          _(value).each(function(val, key){
-            elem.find('[data-property="'+key+'"]').val(val);
-          });
-        } else if ($.isArray(value)){
-          _(value).each(function(val, index){
-            elem.find('[data-index="'+index+'"]').val(val);
-          });
-        } else {
-          elem.val(value);
-        }
+        this.inputVal(elem, value);
       }, this);
     },
 
@@ -82,7 +72,7 @@
       var data = {}, self = this;
 
       _(this.fields).each(function(options, field){
-        data[field] = self.getInputVal(field);
+        data[field] = self.inputVal(field);
       });
 
       return data;
@@ -132,7 +122,7 @@
         fieldErrors = [],
         isValid = true;
 
-      var val = this.getInputVal(field);
+      var val = this.inputVal(field);
 
       if (fieldOptions.required) {
         isValid = this.validateRule(val,'required');
@@ -158,40 +148,66 @@
       }
     },
 
-    getInputVal : function(input) {
+    inputVal : function(input, val) {
       //takes field name or jQuery object
       var el = input.jquery ? input : this.$('[data-field="'+input+'"]');
-      var val = null, self = this;
+      var self = this, mode = typeof val === 'undefined' ? 'get' : 'set';
 
       if (el.data('fieldtype') === 'object'){
-        val = {};
+        if (mode === 'get') val = {};
         el.find('[data-property]').each(function(){
           var elem = $(this);
           var prop = elem.attr('data-property');
-          val[prop] = self.getInputVal(elem);
+          if (mode === 'get'){
+            val[prop] = self.inputVal(elem);
+          } else {
+            self.inputVal(elem, val[prop]);
+          }
         });
       } else if (el.data('fieldtype') === 'array'){
-        val = [];
+        if (mode === 'get') val = [];
         el.find('[data-index]').each(function(){
           var elem = $(this);
           var index = elem.data('index');
-          val[index] = self.getInputVal(elem);
+          if (mode === 'get'){
+            val[index] = self.inputVal(elem);
+          } else {
+            self.inputVal(elem, val[index]);
+          }
         });
       } else if (el.is('input')) {
         var inputType = el.attr('type').toLowerCase();
         switch (inputType) {
           case "radio":
           case "checkbox":
-            val = el.is(':checked');
+            if (mode === 'get'){
+              val = el.is(':checked');
+            } else {
+              el.prop('checked', !!val);
+            }
             break;
           default :
-            val = $.trim(el.val());
+            if (mode === 'get'){
+              val = $.trim(el.val());
+            } else {
+              el.val(val);
+            }
             break;
         }
       } else {
-        if (el.is('textarea')) val = el.text();
+        if (el.is('textarea')){
+          if (mode === 'get'){
+            val = el.text();
+          } else {
+            el.text(val);
+          }
+        }
         if (el.is('select')) {
-          val = $.trim(el.val());
+          if (mode === 'get'){
+            val = $.trim(el.val());
+          } else {
+            el.val(val);
+          }
         }
         //Handle Select / MultiSelect Etc
         //@todo
@@ -261,7 +277,7 @@
 
     matches : function(val,field) {
       /*jshint eqeqeq:false*/
-      return val == this.getInputVal(field);
+      return val == this.inputVal(field);
     },
 
     min : function(val,minLength) {
