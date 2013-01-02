@@ -1,4 +1,6 @@
-# Marionette.Formview
+# Marionette.Formview [![Build Status](https://travis-ci.org/onehealth/marionette.formview.png?branch=master)](https://travis-ci.org/onehealth/marionette.formview)
+
+
 
 A Flexible and customizable Backbone.Marionette Form View.
 
@@ -13,7 +15,7 @@ This is a plugin built on top of the base Marionette ItemView.
 
 Basic knowledge of Backbone(http://backbonejs.org/) and Backbone.Marionette(http://marionettejs.com/) is recommended
 
-Quick JSFiddle Example : http://jsfiddle.net/hxvXL/1/(http://jsfiddle.net/hxvXL/1/)
+Quick JSFiddle Example : http://jsfiddle.net/hxvXL/1/
 
 ```
 var LoginFormView = Marionette.FormView.extend({
