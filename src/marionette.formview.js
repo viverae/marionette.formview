@@ -24,15 +24,9 @@
 
     className : "formView",
 
-    defaults : {
-      field  : {
-        validateOn : 'submit'
-      }
-    },
-
     rules   : {}, //Custom Field Validation Rules
 
-    fields  : {}, //Fields Merged with Defaults
+    fields  : {},
 
     constructor : function(){
       Marionette.ItemView.prototype.constructor.apply(this, arguments);
@@ -65,6 +59,7 @@
         this.$(options.el).data('model-attribute', field);
         if (typeof value === 'undefined') value = '';
         this.$(options.el).val(value);
+        if (options.autoFocus) this.$(options.el).focus();
       },this);
     },
 
