@@ -51,11 +51,8 @@
     },
 
     changeFieldVal : function(model, fields) {
-      var modelProperty = Object.keys(fields.changes),
-        field = this.fields[modelProperty],
-        domItem = this.$('[data-field="'+field+'"]');
-
-      if(domItem) domItem.val(this.model.get(modelProperty));
+      var modelProperty = Object.keys(fields.changes);
+      this.inputVal(modelProperty, this.model.get(modelProperty));
     },
 
     populateFields : function () {
