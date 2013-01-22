@@ -54,10 +54,8 @@
         var value = this.model.get(field),
           elem = this.$('[data-field="'+field+'"]');
 
-        this.$(options.el).data('model-attribute', field);
-        if (typeof value === 'undefined') value = '';
-        this.$(options.el).val(value);
-        if (options.autoFocus) this.$(options.el).focus();
+        this.inputVal(elem, value);
+        if (options.autoFocus) elem.focus();
       },this);
     },
 
