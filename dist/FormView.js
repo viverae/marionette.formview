@@ -1,4 +1,4 @@
-/*! marionette-formview - v0.1.1 - 2012-12-17 */
+/*! marionette-formview - v0.1.2 - 2013-01-02 */
 /*global Backbone,define*/
 
 ;(function (root, factory) {
@@ -25,15 +25,9 @@
 
     className : "formView",
 
-    defaults : {
-      field  : {
-        validateOn : 'submit'
-      }
-    },
-
     rules   : {}, //Custom Field Validation Rules
 
-    fields  : {}, //Fields Merged with Defaults
+    fields  : {},
 
     constructor : function(){
       Marionette.ItemView.prototype.constructor.apply(this, arguments);
@@ -66,6 +60,7 @@
         this.$(options.el).data('model-attribute', field);
         if (typeof value === 'undefined') value = '';
         this.$(options.el).val(value);
+        if (options.autoFocus) this.$(options.el).focus();
       },this);
     },
 
