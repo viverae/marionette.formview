@@ -49,7 +49,7 @@ describe('Validations',function(){
 
     form.render();
 
-    form.$('.fname').blur();
+    form.$('[data-field="fname"]').blur();
 
     expect(validationErrorSpy).toHaveBeenCalledWith({
       el    : '.fname',
@@ -96,7 +96,7 @@ describe('Validations',function(){
     }))();
 
     form.render();
-    form.$('.fname').val('exists');
+    form.$('[data-field="fname"]').val('exists');
     form.submit();
 
     expect(submitFailSpy).toHaveBeenCalledWith({
@@ -156,8 +156,8 @@ describe('Validations',function(){
       }))();
 
       form.render();
-      form.$('.pass1').val('foo');
-      form.$('.pass2').val('bar');
+      form.$('[data-field="pass1"]').val('foo');
+      form.$('[data-field="pass2"]').val('bar');
       form.submit();
 
       expect(submitFailSpy).toHaveBeenCalledWith({
@@ -189,8 +189,8 @@ describe('Validations',function(){
       }))();
 
       form.render();
-      form.$('.pass1').val('foo');
-      form.$('.pass2').val('foo');
+      form.$('[data-field="pass1"]').val('foo');
+      form.$('[data-field="pass2"]').val('foo');
       form.submit();
 
       expect(submitFailSpy).not.toHaveBeenCalled();
