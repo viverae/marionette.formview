@@ -9,7 +9,7 @@ describe("FormView", function () {
       validationErrorSpy;
 
   beforeEach(function () {
-    loadFixtures("formTemplate.html");
+    loadFixtures("formTemplate.html", "nestedFormTemplate.html");
     stopSubmit = function(e) {
       e.preventDefault();
       return false;
@@ -57,7 +57,7 @@ describe("FormView", function () {
     }))();
     form.render();
 
-    expect(form.$('.fname').val()).toEqual(model.get('fname'));
+    expect(form.$('[data-field="fname"]').val()).toEqual(model.get('fname'));
   });
 
   it("Should Call onSubmit upon form submit click", function () {
@@ -174,7 +174,7 @@ describe("FormView", function () {
 
         form.render();
 
-        form.$('.fname').trigger(event);
+        form.$('[data-field="fname"]').trigger(event);
 
         expect(validationErrorSpy).toHaveBeenCalledWith({
           el : '.fname',
@@ -200,6 +200,38 @@ describe("FormView", function () {
 
     form.render();
     expect(readySpy).toHaveBeenCalled();
+  });
+
+  it("Should populate and serialize nested form data", function(){
+    var model = new Backbone.Model({
+      address: {
+        street: '123 Test Street',
+        city: 'Fakeville',
+        state: 'CA',
+        zip: '11111'
+      },
+      items: [
+        'item one',
+        'item two',
+        'item three'
+      ]
+    });
+    var fields = {
+      address: {
+        el: '.address'
+      },
+      items: {
+        el: '.items'
+      }
+    };
+    var form = new (Marionette.FormView.extend({
+      template: '#nested-form-template',
+      fields: fields,
+      model: model
+    }))();
+    form.render();
+    var serialized = form.serializeFormData();
+    expect(serialized).toEqual(model.toJSON());
   });
 
 });

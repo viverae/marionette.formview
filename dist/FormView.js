@@ -48,14 +48,15 @@
     changeFieldVal : function(model, fields) {
       var modelProperty = Object.keys(fields.changes),
         field = this.fields[modelProperty],
-        domItem = this.$(field.el);
+        domItem = this.$('[data-field="'+field+'"]');
 
       if(domItem) domItem.val(this.model.get(modelProperty));
     },
 
     populateFields : function () {
-      _(this.fields).each(function(options,field) {
-        var value = this.model.get(field);
+      _(this.fields).each(function(options, field) {
+        var value = this.model.get(field),
+          elem = this.$('[data-field="'+field+'"]');
 
         this.$(options.el).data('model-attribute', field);
         if (typeof value === 'undefined') value = '';
@@ -65,14 +66,11 @@
     },
 
     serializeFormData : function () {
-      var data = {};
+      var data = {}, self = this;
 
-      function getFieldData(options,field) {
-        /*jshint validthis:true*/
-        var el = this.$(options.el);
-        if (el) data[field] = this.getInputVal(el);
-      }
-      _.each(this.fields, _(getFieldData).bind(this));
+      _(this.fields).each(function(options, field){
+        data[field] = self.inputVal(field);
+      });
 
       return data;
     },
@@ -95,7 +93,7 @@
 
     handleFieldEvent : function(evt, eventName) {
       var el = evt.target || evt.srcElement,
-        field = $(el).data('model-attribute'),
+        field = $(el).attr('data-field'),
         fieldOptions = this.fields[field];
 
       if (fieldOptions && fieldOptions.validateOn === eventName) {
@@ -121,8 +119,7 @@
         fieldErrors = [],
         isValid = true;
 
-      var el = this.$(fieldOptions.el),
-        val = this.getInputVal(el);
+      var val = this.inputVal(field);
 
       if (fieldOptions.required) {
         isValid = this.validateRule(val,'required');
@@ -148,27 +145,66 @@
       }
     },
 
-    getInputVal : function(el) {
-      if (!el) return '';
-      if (!el.jQuery) el = this.$(el);
+    inputVal : function(input, val) {
+      //takes field name or jQuery object
+      var el = input.jquery ? input : this.$('[data-field="'+input+'"]');
+      var self = this, mode = typeof val === 'undefined' ? 'get' : 'set';
 
-      var val;
-
-      if (el.is('input')) {
+      if (el.data('fieldtype') === 'object'){
+        if (mode === 'get') val = {};
+        el.find('[data-property]').each(function(){
+          var elem = $(this);
+          var prop = elem.attr('data-property');
+          if (mode === 'get'){
+            val[prop] = self.inputVal(elem);
+          } else if (val){
+            self.inputVal(elem, val[prop]);
+          }
+        });
+      } else if (el.data('fieldtype') === 'array'){
+        if (mode === 'get') val = [];
+        el.find('[data-index]').each(function(){
+          var elem = $(this);
+          var index = elem.data('index');
+          if (mode === 'get'){
+            val[index] = self.inputVal(elem);
+          } else if (val){
+            self.inputVal(elem, val[index]);
+          }
+        });
+      } else if (el.is('input')) {
         var inputType = el.attr('type').toLowerCase();
         switch (inputType) {
           case "radio":
           case "checkbox":
-            val = el.is(':checked');
+            if (mode === 'get'){
+              val = el.is(':checked');
+            } else {
+              el.prop('checked', !!val);
+            }
             break;
           default :
-            val = $.trim(el.val());
+            if (mode === 'get'){
+              val = $.trim(el.val());
+            } else {
+              el.val(val);
+            }
             break;
         }
       } else {
-        if (el.is('textarea')) val = el.text();
+        if (el.is('textarea')){
+          if (mode === 'get'){
+            val = el.text();
+          } else {
+            el.text(val);
+          }
+        }
         if (el.is('select')) {
-          val = $.trim(el.val());
+          if (mode === 'get'){
+            val = $.trim(el.val());
+          } else {
+            el.val(val);
+          }
         }
         //Handle Select / MultiSelect Etc
         //@todo
@@ -238,8 +274,7 @@
 
     matches : function(val,field) {
       /*jshint eqeqeq:false*/
-      var el = this.fields[field[0]].el;
-      return val == this.getInputVal(el);
+      return val == this.inputVal(field);
     },
 
     min : function(val,minLength) {
