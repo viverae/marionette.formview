@@ -1,4 +1,4 @@
-/*! marionette-formview - v0.1.2 - 2013-01-02 */
+/*! marionette-formview - v0.2.0 - 2013-01-31 */
 /*global Backbone,define*/
 
 ;(function (root, factory) {
@@ -46,11 +46,8 @@
     },
 
     changeFieldVal : function(model, fields) {
-      var modelProperty = Object.keys(fields.changes),
-        field = this.fields[modelProperty],
-        domItem = this.$('[data-field="'+field+'"]');
-
-      if(domItem) domItem.val(this.model.get(modelProperty));
+      var modelProperty = Object.keys(fields.changes);
+      this.inputVal(modelProperty, this.model.get(modelProperty));
     },
 
     populateFields : function () {
@@ -58,10 +55,8 @@
         var value = this.model.get(field),
           elem = this.$('[data-field="'+field+'"]');
 
-        this.$(options.el).data('model-attribute', field);
-        if (typeof value === 'undefined') value = '';
-        this.$(options.el).val(value);
-        if (options.autoFocus) this.$(options.el).focus();
+        this.inputVal(elem, value);
+        if (options.autoFocus) elem.focus();
       },this);
     },
 
