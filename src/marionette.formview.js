@@ -45,8 +45,10 @@
     },
 
     changeFieldVal : function(model, fields) {
-      var modelProperty = Object.keys(fields.changes);
-      this.inputVal(modelProperty, this.model.get(modelProperty));
+      if(fields.length) {
+        var modelProperty = Object.keys(fields.changes);
+        this.inputVal(modelProperty, this.model.get(modelProperty));
+      }
     },
 
     populateFields : function () {

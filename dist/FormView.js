@@ -1,4 +1,4 @@
-/*! marionette-formview - v0.2.0 - 2013-01-31 */
+/*! marionette-formview - v0.2.0 - 2013-03-08 */
 /*global Backbone,define*/
 
 ;(function (root, factory) {
@@ -46,8 +46,10 @@
     },
 
     changeFieldVal : function(model, fields) {
-      var modelProperty = Object.keys(fields.changes);
-      this.inputVal(modelProperty, this.model.get(modelProperty));
+      if(fields.length) {
+        var modelProperty = Object.keys(fields.changes);
+        this.inputVal(modelProperty, this.model.get(modelProperty));
+      }
     },
 
     populateFields : function () {
