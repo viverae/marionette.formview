@@ -45,7 +45,7 @@
     },
 
     changeFieldVal : function(model, fields) {
-      if(fields.length) {
+      if(_.isEmpty(fields)) {
         var modelProperty = Object.keys(fields.changes);
         this.inputVal(modelProperty, this.model.get(modelProperty));
       }
