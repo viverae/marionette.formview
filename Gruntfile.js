@@ -82,9 +82,9 @@ module.exports = function (grunt) {
       test: {
         src     : [
           'vendor/jquery-1.8.2.js',
-          'vendor/underscore.js',
-          'vendor/backbone.js',
-          'vendor/marionette.core.js',
+          'vendor/underscore-1.4.4.js',
+          'vendor/backbone-1.0.0.js',
+          'vendor/backbone.marionette-1.0.3.js',
           'src/marionette.formview.js'
         ],
         options : {
