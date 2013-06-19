@@ -68,6 +68,9 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 
 ## Release History
 
+- 1.0.0 Fixed bindTo -> listenTo Backbone/Marionette Deprecation
+- 0.2.2 Fixed issue with empty fields object
+- 0.2.1 Fixed issue with calling model.set() with no changes
 - 0.2.0 Support for nested input hierarchies
 - 0.1.1 Minor Bug Fixes
 - 0.1.0 Initial release
