@@ -46,11 +46,13 @@ describe("FormView", function () {
         fname : {
           el : ".fname"
         },
+        about: {},
         status: {}
       };
     var model = new Backbone.Model();
     model.set({
       fname: 'foo',
+      about: 'this is a description',
       status: 'active'
     });
 
@@ -62,6 +64,7 @@ describe("FormView", function () {
     form.render();
 
     expect(form.$('[data-field="fname"]').val()).toEqual(model.get('fname'));
+    expect(form.$('[data-field="about"]').val()).toEqual(model.get('about'));
     var radioButtons = form.$('[data-field="status"]');
     radioButtons.each(function(){
       var button = $(this);
