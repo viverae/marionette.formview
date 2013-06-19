@@ -172,6 +172,21 @@
         var inputType = el.attr('type').toLowerCase();
         switch (inputType) {
           case "radio":
+            el.each(function(){
+              var radio = $(this);
+              if (mode === 'get'){
+                if (radio.is(':checked')){
+                  val = radio.val();
+                  return false;
+                }
+              } else {
+                if (radio.val() === val){
+                  radio.prop('checked', true);
+                  return false;
+                }
+              }
+            });
+            break;
           case "checkbox":
             if (mode === 'get'){
               val = el.is(':checked');
