@@ -1,4 +1,4 @@
-/*! marionette-formview - v0.2.2 - 2013-03-11 */
+/*! marionette-formview - v1.0.0 - 2013-06-19 */
 /*global Backbone,define*/
 
 ;(function (root, factory) {
@@ -37,7 +37,7 @@
 
       if (!this.model) this.model = new Backbone.Model();
 
-      this.bindTo(this.model, 'change', this.changeFieldVal,this);
+      this.listenTo(this.model, 'change', this.changeFieldVal,this);
       if (this.data) this.model.set(this.data);
 
       //Attach Events to preexisting elements if we don't have a template
@@ -173,6 +173,21 @@
         var inputType = el.attr('type').toLowerCase();
         switch (inputType) {
           case "radio":
+            el.each(function(){
+              var radio = $(this);
+              if (mode === 'get'){
+                if (radio.is(':checked')){
+                  val = radio.val();
+                  return false;
+                }
+              } else {
+                if (radio.val() === val){
+                  radio.prop('checked', true);
+                  return false;
+                }
+              }
+            });
+            break;
           case "checkbox":
             if (mode === 'get'){
               val = el.is(':checked');
