@@ -45,10 +45,16 @@ describe("FormView", function () {
     var fieldsHash = {
         fname : {
           el : ".fname"
-        }
+        },
+        about: {},
+        status: {}
       };
     var model = new Backbone.Model();
-    model.set('fname','foo');
+    model.set({
+      fname: 'foo',
+      about: 'this is a description',
+      status: 'active'
+    });
 
     var form = new (Marionette.FormView.extend({
       template : "#form-template",
@@ -58,6 +64,16 @@ describe("FormView", function () {
     form.render();
 
     expect(form.$('[data-field="fname"]').val()).toEqual(model.get('fname'));
+    expect(form.$('[data-field="about"]').val()).toEqual(model.get('about'));
+    var radioButtons = form.$('[data-field="status"]');
+    radioButtons.each(function(){
+      var button = $(this);
+      if (button.val() === model.get('status')){
+        expect(button).toBeChecked();
+      } else {
+        expect(button).not.toBeChecked();
+      }
+    });
   });
 
   it("Should Call onSubmit upon form submit click", function () {

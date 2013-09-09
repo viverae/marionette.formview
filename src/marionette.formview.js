@@ -172,6 +172,21 @@
         var inputType = el.attr('type').toLowerCase();
         switch (inputType) {
           case "radio":
+            el.each(function(){
+              var radio = $(this);
+              if (mode === 'get'){
+                if (radio.is(':checked')){
+                  val = radio.val();
+                  return false;
+                }
+              } else {
+                if (radio.val() === val){
+                  radio.prop('checked', true);
+                  return false;
+                }
+              }
+            });
+            break;
           case "checkbox":
             if (mode === 'get'){
               val = el.is(':checked');
@@ -188,19 +203,10 @@
             break;
         }
       } else {
-        if (el.is('textarea')){
-          if (mode === 'get'){
-            val = el.text();
-          } else {
-            el.text(val);
-          }
-        }
-        if (el.is('select')) {
-          if (mode === 'get'){
-            val = $.trim(el.val());
-          } else {
-            el.val(val);
-          }
+        if (mode === 'get'){
+          val = $.trim(el.val());
+        } else {
+          el.val(val);
         }
         //Handle Select / MultiSelect Etc
         //@todo
