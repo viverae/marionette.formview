@@ -15,7 +15,7 @@ This is a plugin built on top of the base Marionette ItemView.
 
 Basic knowledge of Backbone(http://backbonejs.org/) and Backbone.Marionette(http://marionettejs.com/) is recommended
 
-Quick JSFiddle Example : http://jsfiddle.net/hxvXL/1/
+Quick JSFiddle Example : http://jsfiddle.net/hxvXL/10/
 
 ```
 var LoginFormView = Marionette.FormView.extend({
