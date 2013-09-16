@@ -45,18 +45,21 @@
     },
 
     changeFieldVal : function(model, fields) {
-      if(!_.isEmpty(fields)) {
+      if(!_.isEmpty(fields) && fields.changes) {
         var modelProperty = Object.keys(fields.changes);
         this.inputVal(modelProperty, this.model.get(modelProperty));
+      } else if (fields.unset) {
+        _(this.fields).each(function(options, field) {
+          var elem = this.$('[data-field="'+field+'"]');
+          this.inputVal(elem, this.model.get(field));
+        },this);
       }
     },
 
     populateFields : function () {
       _(this.fields).each(function(options, field) {
-        var value = this.model.get(field),
-          elem = this.$('[data-field="'+field+'"]');
-
-        this.inputVal(elem, value);
+        var elem = this.$('[data-field="'+field+'"]');
+        this.inputVal(elem, this.model.get(field));
         if (options.autoFocus) elem.focus();
       },this);
     },

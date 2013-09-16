@@ -250,4 +250,33 @@ describe("FormView", function () {
     expect(serialized).toEqual(model.toJSON());
   });
 
+
+  it("Should allow a model.clear() with options other than {changes : obj}", function() {
+
+    var model = new Backbone.Model({
+      address: {
+        street: '123 Test Street',
+        city: 'Fakeville',
+        state: 'CA',
+        zip: '11111'
+      }
+    });
+    
+    var fields = {
+      address: {
+        el: '.address'
+      }
+    };
+
+    var form = new (Marionette.FormView.extend({
+      template: '#nested-form-template',
+      fields: fields,
+      model: model
+    }))().render();
+
+    expect(form.model.get('address')).toBeTruthy();
+    form.model.clear();
+    expect(form.model.get('address')).toBeUndefined();
+  });
+
 });

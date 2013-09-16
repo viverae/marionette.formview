@@ -1,7 +1,7 @@
 {
   "name": "marionette-formview",
   "description": "FormView Plugin For Backbone.Marionette",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": {
     "name": "Chris Miller",
     "email": "cmiller@onehealth.com",
