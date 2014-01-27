@@ -1,4 +1,4 @@
-/*! marionette-formview - v1.0.0 - 2013-06-19 */
+/*! marionette-formview - v1.0.1 - 2014-01-27 */
 /*global Backbone,define*/
 
 ;(function (root, factory) {
@@ -38,7 +38,6 @@
       if (!this.model) this.model = new Backbone.Model();
 
       this.listenTo(this.model, 'change', this.changeFieldVal,this);
-
       if (this.data) this.model.set(this.data);
 
       //Attach Events to preexisting elements if we don't have a template
@@ -50,15 +49,18 @@
       if(!_.isEmpty(fields) && fields.changes) {
         var modelProperty = Object.keys(fields.changes);
         this.inputVal(modelProperty, this.model.get(modelProperty));
+      } else if (fields.unset) {
+        _(this.fields).each(function(options, field) {
+          var elem = this.$('[data-field="'+field+'"]');
+          this.inputVal(elem, this.model.get(field));
+        },this);
       }
     },
 
     populateFields : function () {
       _(this.fields).each(function(options, field) {
-        var value = this.model.get(field),
-          elem = this.$('[data-field="'+field+'"]');
-
-        this.inputVal(elem, value);
+        var elem = this.$('[data-field="'+field+'"]');
+        this.inputVal(elem, this.model.get(field));
         if (options.autoFocus) elem.focus();
       },this);
     },

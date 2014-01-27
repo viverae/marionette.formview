@@ -2,35 +2,35 @@ module.exports = function (grunt) {
 
   // Project configuration.
   grunt.initConfig({
-    pkg    : grunt.file.readJSON('package.json'),
-    banner : '/*! <%= pkg.name %> - v<%= pkg.version %> - ' +
-             '<%= grunt.template.today("yyyy-mm-dd") %> */\n',
-    concat: {
-      options: {
-        banner: '<%= banner %>'
+    pkg     : grunt.file.readJSON('package.json'),
+    banner  : '/*! <%= pkg.name %> - v<%= pkg.version %> - ' +
+      '<%= grunt.template.today("yyyy-mm-dd") %> */\n',
+    concat  : {
+      options : {
+        banner : '<%= banner %>'
       },
-      dist: {
+      dist    : {
         src  : ['src/marionette.formview.js'],
         dest : 'dist/FormView.js'
       }
     },
-    uglify    : {
-      options: {
-        banner: '<%= banner %>'
+    uglify  : {
+      options : {
+        banner : '<%= banner %>'
       },
-      dist: {
+      dist    : {
         src  : '<%= concat.dist.dest %>',
         dest : 'dist/FormView.min.js'
       }
     },
-    lint   : {
+    lint    : {
       src   : 'src/**/*.js',
       grunt : 'Gruntfile.js',
       tests : [
         'spec/**/*Spec.js'
       ]
     },
-    jshint : {
+    jshint  : {
       options : {
         curly   : true,
         eqeqeq  : true,
@@ -74,12 +74,12 @@ module.exports = function (grunt) {
         }
       }
     },
-    watch            : {
+    watch   : {
       files : ['<%= jasmine.specs %>', 'src/*js'],
       tasks : 'jasmine'
     },
-    jasmine          : {
-      test: {
+    jasmine : {
+      test : {
         src     : [
           'vendor/jquery-1.8.2.js',
           'vendor/underscore-1.4.4.js',
@@ -103,12 +103,12 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-uglify');
 
   // Default task.
-  grunt.registerTask('default', ['lint', 'jasmine']);
+  grunt.registerTask('default', ['jshint', 'jasmine']);
   grunt.registerTask('test', ['jasmine']);
   grunt.registerTask('test-web', ['jasmine-server']);
 
   //Turned LINT off complaining about /*jshint unused:true */
   grunt.registerTask('build', ['concat', 'uglify', 'jasmine']);
-  grunt.registerTask('build-notest', ['lint', 'concat', 'uglify']);
+  grunt.registerTask('build-notest', ['jshint', 'concat', 'uglify']);
 
 };
