@@ -218,36 +218,78 @@ describe("FormView", function () {
     expect(readySpy).toHaveBeenCalled();
   });
 
-  it("Should populate and serialize nested form data", function(){
-    var model = new Backbone.Model({
-      address: {
-        street: '123 Test Street',
-        city: 'Fakeville',
-        state: 'CA',
-        zip: '11111'
-      },
-      items: [
-        'item one',
-        'item two',
-        'item three'
-      ]
+  describe('serialization', function() {
+    it("Should populate and serialize nested form data", function(){
+      var model = new Backbone.Model({
+        address: {
+          street: '123 Test Street',
+          city: 'Fakeville',
+          state: 'CA',
+          zip: '11111',
+          instructions: 'leave in hallway'
+        },
+        items: [
+          'item one',
+          'item two',
+          'item three'
+        ]
+      });
+      var fields = {
+        address: {
+          el: '.address'
+        },
+        items: {
+          el: '.items'
+        }
+      };
+      var form = new (Marionette.FormView.extend({
+        template: '#nested-form-template',
+        fields: fields,
+        model: model
+      }))();
+      form.render();
+      var serialized = form.serializeFormData();
+      expect(serialized).toEqual(model.toJSON());
     });
-    var fields = {
-      address: {
-        el: '.address'
-      },
-      items: {
-        el: '.items'
-      }
-    };
-    var form = new (Marionette.FormView.extend({
-      template: '#nested-form-template',
-      fields: fields,
-      model: model
-    }))();
-    form.render();
-    var serialized = form.serializeFormData();
-    expect(serialized).toEqual(model.toJSON());
+
+    it('should trim whitespace except for on passwords', function() {
+      var model = new Backbone.Model({
+        fname: ' SpaceInFront',
+        lname: 'SpaceInBack ',
+        pass1: ' space in front',
+        pass2: 'space in back ',
+        about: '        Lots of whitespace goes here                    '
+      });
+      var fields = {
+        fname: {
+          el: '.fname'
+        },
+        lname: {
+          el: '.lname'
+        },
+        pass1: {
+          el: '.pass1'
+        },
+        pass2: {
+          el: '.pass2'
+        },
+        about: {
+          el: '.about'
+        }
+      };
+      var form = new (Marionette.FormView.extend({
+        template: '#form-template',
+        model: model,
+        fields: fields
+      }))();
+      form.render();
+      var serialized = form.serializeFormData();
+      expect(serialized.fname).toEqual('SpaceInFront');
+      expect(serialized.lname).toEqual('SpaceInBack');
+      expect(serialized.pass1).toEqual(' space in front');
+      expect(serialized.pass2).toEqual('space in back ');
+      expect(serialized.about).toEqual('Lots of whitespace goes here');
+    });
   });
 
 

@@ -198,6 +198,13 @@
               el.prop('checked', !!val);
             }
             break;
+          case "password":
+            if (mode === 'get'){
+              val = el.val();
+            } else {
+              el.val(val);
+            }
+            break;
           default :
             if (mode === 'get'){
               val = $.trim(el.val());
