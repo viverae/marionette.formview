@@ -1,3 +1,5 @@
+/*global module:true */
+
 module.exports = function (grunt) {
 
   // Project configuration.
@@ -23,61 +25,20 @@ module.exports = function (grunt) {
         dest : 'dist/FormView.min.js'
       }
     },
-    lint    : {
-      src   : 'src/**/*.js',
-      grunt : 'Gruntfile.js',
-      tests : [
-        'spec/**/*Spec.js'
+
+    jshint : {
+
+      options : {
+        jshintrc : './.jshintrc'
+      },
+      all : [
+        'Gruntfile.js',
+        'src/js/**/*.js',
+        'spec/**/*.js',
+        '!spec/helpers/**/*.js'
       ]
     },
-    jshint  : {
-      options : {
-        curly   : true,
-        eqeqeq  : true,
-        immed   : true,
-        latedef : true,
-        newcap  : true,
-        noarg   : true,
-        sub     : true,
-        undef   : true,
-        boss    : true,
-        eqnull  : true,
-        node    : true,
-        es5     : true,
-        unused  : true
-      },
-      globals : {
-        jQuery : true
-      },
-      grunt   : {
-        options : {node : true},
-        globals : {
-          task     : true,
-          config   : true,
-          file     : true,
-          log      : true,
-          template : true
-        }
-      },
-      src     : {
-        options : {unused : false}
-      },
-      tests   : {
-        globals : {
-          jasmine    : false,
-          describe   : false,
-          beforeEach : false,
-          expect     : false,
-          it         : false,
-          spyOn      : false,
-          xit        : false
-        }
-      }
-    },
-    watch   : {
-      files : ['<%= jasmine.specs %>', 'src/*js'],
-      tasks : 'jasmine'
-    },
+
     jasmine : {
       test : {
         src     : [
