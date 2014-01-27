@@ -1,4 +1,4 @@
-# Marionette.Formview [![Build Status](https://travis-ci.org/onehealth/marionette.formview.png?branch=master)](https://travis-ci.org/onehealth/marionette.formview)
+# Marionette.Formview [![Build Status](https://travis-ci.org/onehealth/marionette.formview.png?branch=master)](https://travis-ci.org/onehealth/marionette.formview) [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/onehealth/marionette.formview/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
 
 
 
