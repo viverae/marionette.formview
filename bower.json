@@ -1,0 +1,9 @@
+{
+  "name": "marionette-formview",
+  "version": "1.0.1",
+  "dependencies": {
+    "backbone.marionette": "*"
+  },
+  "main": "dist/FormView.js",
+  "description": "FormView Plugin For Backbone.Marionette"
+}
