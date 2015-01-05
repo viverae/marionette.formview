@@ -321,4 +321,25 @@ describe("FormView", function () {
     expect(form.model.get('address')).toBeUndefined();
   });
 
+  it("should default inputType to text if type attribute not specified in the el", function(){
+    var model = new Backbone.Model({
+      notype: 'test'
+    });
+
+    var fields = {
+      notype: {
+        el: '.notype'
+      }
+    };
+
+    var form = new (Marionette.FormView.extend({
+      model: model,
+      template: '#form-template',
+      fields: fields
+    }))().render();
+
+    var serialized = form.serializeFormData();
+    expect(serialized.notype).toEqual('test');
+  });
+
 });

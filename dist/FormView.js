@@ -1,4 +1,4 @@
-/*! marionette-formview - v1.0.1 - 2014-01-27 */
+/*! marionette-formview - v1.0.1 - 2015-01-05 */
 /*global Backbone,define*/
 
 ;(function (root, factory) {
@@ -173,7 +173,7 @@
           }
         });
       } else if (el.is('input')) {
-        var inputType = el.attr('type').toLowerCase();
+        var inputType = el.attr('type') ? el.attr('type').toLowerCase() : 'text';
         switch (inputType) {
           case "radio":
             el.each(function(){
