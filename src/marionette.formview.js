@@ -172,7 +172,7 @@
           }
         });
       } else if (el.is('input')) {
-        var inputType = el.attr('type').toLowerCase();
+        var inputType = el.attr('type') ? el.attr('type').toLowerCase() : 'text';
         switch (inputType) {
           case "radio":
             el.each(function(){
