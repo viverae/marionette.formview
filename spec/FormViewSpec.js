@@ -338,6 +338,7 @@ describe("FormView", function () {
       fields: fields
     }))().render();
 
+    expect(form.$('input[data-field="notype"]').prop('type')).toEqual('text');
     var serialized = form.serializeFormData();
     expect(serialized.notype).toEqual('test');
   });
