@@ -78,7 +78,8 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 
 ## License
 
-Copyright (c) 2012 OneHealth Solutions, Inc
+Copyright (c) 2012-2014 OneHealth Solutions, Inc
+Copyright (c) 2014-2015 Viverae, Inc
 Licensed under the Apache 2.0 license.
 
 ## Author
