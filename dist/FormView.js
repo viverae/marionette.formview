@@ -1,4 +1,4 @@
-/*! marionette-formview - v1.0.1 - 2015-01-05 */
+/*! marionette-formview - v1.0.1 - 2015-01-14 */
 /*global Backbone,define*/
 
 ;(function (root, factory) {
@@ -325,6 +325,8 @@
       return _.isBoolean(val);
     }
   };
+
+  FormView.FormValidator = FormValidator;
 
   return FormView;
 }));
