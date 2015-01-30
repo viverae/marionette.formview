@@ -152,6 +152,7 @@ describe('Validations',function(){
       rules : {
         foo : function(val, fieldName) {
           expect(fieldName).not.toBeUndefined();
+          expect(fieldName).toEqual('fname');
           return false;
         }
       },
