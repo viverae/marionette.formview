@@ -136,6 +136,35 @@ describe('Validations',function(){
     expect(submitSpy).not.toHaveBeenCalled();
   });
 
+  it('should pass field name into custom validations', function(){
+    var form = new (Backbone.Marionette.FormView.extend({
+      template         : "#form-template",
+      fields           : {
+        fname : {
+          el         : ".fname",
+          required   : true,
+          validateOn : 'blur',
+          validations : {
+            foo : 'BAR'
+          }
+        }
+      },
+      rules : {
+        foo : function(val, fieldName) {
+          expect(fieldName).not.toBeUndefined();
+          return false;
+        }
+      },
+      onValidationFail : validationErrorSpy,
+      onSubmitFail     : submitFailSpy,
+      onSubmit         : submitSpy
+    }))();
+
+    form.render();
+    form.$('[data-field="fname"]').val('exists');
+    form.submit();
+  });
+
   describe('match',function(){
     it('should fail if a field does not match another',function(){
       var form = new (Backbone.Marionette.FormView.extend({
