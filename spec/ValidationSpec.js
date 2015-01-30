@@ -282,5 +282,12 @@ describe('Validations',function(){
     });
   });
 
+  describe('FormValidator', function(){
+    it('is exposed on the FormView class for value validation outside of a form', function(){
+      var validator = Backbone.Marionette.FormView.FormValidator;
+      expect(validator.numeric(5)).toBe(true);
+    });
+  });
+
 });
 
