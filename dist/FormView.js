@@ -326,5 +326,7 @@
     }
   };
 
+  FormView.FormValidator = FormValidator;
+
   return FormView;
 }));
