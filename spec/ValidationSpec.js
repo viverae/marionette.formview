@@ -136,7 +136,7 @@ describe('Validations',function(){
     expect(submitSpy).not.toHaveBeenCalled();
   });
 
-  it('should pass field name into custom validations', function(){
+  it('should pass field options into custom validations', function(){
     var form = new (Backbone.Marionette.FormView.extend({
       template         : "#form-template",
       fields           : {
@@ -146,13 +146,16 @@ describe('Validations',function(){
           validateOn : 'blur',
           validations : {
             foo : 'BAR'
+          },
+          validationOptions : {
+            foo: 'bar'
           }
         }
       },
       rules : {
-        foo : function(val, fieldName) {
-          expect(fieldName).not.toBeUndefined();
-          expect(fieldName).toEqual('fname');
+        foo : function(val, fieldOptions) {
+          expect(fieldOptions).not.toBeUndefined();
+          expect(fieldOptions.validationOptions.foo).toEqual('bar');
           return false;
         }
       },
