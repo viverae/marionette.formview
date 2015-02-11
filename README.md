@@ -1,4 +1,4 @@
-# Marionette.Formview [![Build Status](https://travis-ci.org/onehealth/marionette.formview.png?branch=master)](https://travis-ci.org/onehealth/marionette.formview) [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/onehealth/marionette.formview/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+# Marionette.Formview [![Build Status](https://travis-ci.org/viverae/marionette.formview.png?branch=master)](https://travis-ci.org/viverae/marionette.formview) [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/viverae/marionette.formview/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
 
 
 
@@ -79,7 +79,10 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 
 ## License
 
-Copyright (c) 2012 OneHealth Solutions, Inc
+Copyright (c) 2012-2014 OneHealth Solutions, Inc
+
+Copyright (c) 2014-2015 Viverae, Inc
+
 Licensed under the Apache 2.0 license.
 
 ## Author
