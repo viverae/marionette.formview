@@ -68,6 +68,7 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 
 ## Release History
 
+- 1.1.0 Expose FormValidator and add fieldOptions as an arg. 
 - 1.0.1 Fixed issue with calling model.clear()
 - 1.0.0 Fixed bindTo -> listenTo Backbone/Marionette Deprecation
 - 0.2.2 Fixed issue with empty fields object
