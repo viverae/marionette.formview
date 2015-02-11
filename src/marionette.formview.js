@@ -129,7 +129,7 @@
       // Don't bother with other validations if failed 'required' already
       if (isValid && validations) {
         _.each(validations, function (errorMsg, validateWith) {
-          isValid = this.validateRule(val, validateWith);
+          isValid = this.validateRule(val, validateWith, fieldOptions);
           if (!isValid) fieldErrors.push(errorMsg);
         },this);
       }
@@ -225,7 +225,7 @@
       return val;
     },
 
-    validateRule : function (val,validationRule) {
+    validateRule : function (val, validationRule, fieldOptions) {
       var options;
 
       // throw an error because it could be tough to troubleshoot if we just return false
@@ -239,7 +239,7 @@
       }
 
       if (this.rules && this.rules[validationRule]) {
-        return _(this.rules[validationRule]).bind(this)(val);
+        return _(this.rules[validationRule]).bind(this)(val, fieldOptions);
       } else {
         return _(FormValidator.validate).bind(this)(validationRule, val, options);
       }
@@ -324,6 +324,8 @@
       return _.isBoolean(val);
     }
   };
+
+  FormView.FormValidator = FormValidator;
 
   return FormView;
 }));
